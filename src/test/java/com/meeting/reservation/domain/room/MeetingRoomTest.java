@@ -86,45 +86,6 @@ class MeetingRoomTest {
     }
 
     @Test
-    void 회의실_위치를_변경한다() {
-        // given
-        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
-
-        // when
-        MeetingRoom actual = meetingRoom.moveLocation(MeetingRoomLocation.create(2, 2));
-
-        // then
-        assertThat(actual.getLocation()).isEqualTo(MeetingRoomLocation.create(2, 2));
-    }
-
-    @Test
-    void 회의실_이름을_변경한다() {
-        // given
-        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
-
-        // when
-        MeetingRoom actual = meetingRoom.changeName("집중학습실1");
-
-        // then
-        assertThat(actual.getName()).isEqualTo("집중학습실1");
-    }
-
-    @ParameterizedTest(name = "{0}일 때 생성할 수 없다.")
-    @NullAndEmptySource
-    void 유효하지_않은_회의실_이름으로는_변경할_수_없다(String name) {
-        // given
-        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
-
-        // when & then
-        assertThatThrownBy(() -> meetingRoom.changeName(name))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("회의실 이름은 비어 있을 수 없습니다.");
-    }
-
-    @Test
     void 회의실_ID가_동등한지_확인한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
@@ -133,32 +94,6 @@ class MeetingRoomTest {
 
         // when
         boolean actual = meetingRoom.isEqualId(1L);
-
-        // then
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void 회의실_이름이_동등한지_확인한다() {
-        // given
-        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
-
-        // when
-        boolean actual = meetingRoom.isEqualName("학습실1");
-
-        // then
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void 회의실_위치가_동등한지_확인한다() {
-        // given
-        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
-
-        // when
-        boolean actual = meetingRoom.isEqualLocation(1, 1);
 
         // then
         assertThat(actual).isTrue();

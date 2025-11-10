@@ -58,39 +58,11 @@ public class MeetingRoom {
         );
     }
 
-    public MeetingRoom moveLocation(MeetingRoomLocation location) {
-        return new MeetingRoom(
-                this.id,
-                this.name,
-                this.capacity,
-                location
-        );
-    }
-
-    public MeetingRoom changeName(String changedName) {
-        validateName(changedName);
-
-        return new MeetingRoom(
-                this.id,
-                changedName,
-                this.capacity,
-                this.location
-        );
-    }
-
     public boolean canAccommodate(int attendeeCount) {
         return this.capacity >= attendeeCount;
     }
 
     public boolean isEqualId(Long id) {
         return this.id.isEqualId(id);
-    }
-
-    public boolean isEqualName(String name) {
-        return this.name.equals(name);
-    }
-
-    public boolean isEqualLocation(int floor, int roomNumber) {
-        return this.location.isEqualLocation(floor, roomNumber);
     }
 }

@@ -22,20 +22,6 @@ public class MeetingRooms {
                      .orElseThrow(() -> new MeetingRoomNotFoundException("지정한 ID에 해당하는 회의실을 찾을 수 없습니다."));
     }
 
-    public MeetingRoom findMeetingRoom(int floor, int roomNumber) {
-        return values.stream()
-                     .filter(meetingRoom -> meetingRoom.isEqualLocation(floor, roomNumber))
-                     .findAny()
-                     .orElseThrow(() -> new MeetingRoomNotFoundException("지정한 위치에 해당하는 회의실을 찾을 수 없습니다."));
-    }
-
-    public MeetingRoom findMeetingRoom(String name) {
-        return values.stream()
-                     .filter(meetingRoom -> meetingRoom.isEqualName(name))
-                     .findAny()
-                     .orElseThrow(() -> new MeetingRoomNotFoundException("지정한 이름에 해당하는 회의실을 찾을 수 없습니다."));
-    }
-
     public List<MeetingRoom> getMeetingRooms() {
         return Collections.unmodifiableList(values);
     }
