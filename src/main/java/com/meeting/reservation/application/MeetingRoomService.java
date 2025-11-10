@@ -16,4 +16,9 @@ public class MeetingRoomService {
         return meetingRoomRepository.findAll()
                                     .getMeetingRooms();
     }
+
+    public List<MeetingRoom> findAllAccommodating(int attendeeCount) {
+        return meetingRoomRepository.findAll()
+                                    .findAccommodating(attendeeCount);
+    }
 }
