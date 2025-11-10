@@ -1,0 +1,73 @@
+package com.meeting.reservation.persistence;
+
+import com.meeting.reservation.domain.reservation.Reservation;
+import com.meeting.reservation.domain.reservation.Reservations;
+import com.meeting.reservation.domain.reservation.repository.ReservationRepository;
+import com.meeting.reservation.domain.room.vo.MeetingRoomId;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class InMemoryReservationRepository implements ReservationRepository {
+
+    private final AtomicLong idGenerator = new AtomicLong(1L);
+    private final Map<Long, List<Reservation>> reservations = new ConcurrentHashMap<>();
+
+    @Override
+    public Reservation save(Long meetingRoomId, Reservation reservation) {
+        Long reservationId = idGenerator.getAndAdd(1L);
+        Reservation savedReservation = reservation.withAssignedId(reservationId);
+
+        reservations.computeIfAbsent(meetingRoomId, key -> new CopyOnWriteArrayList<>())
+                    .add(savedReservation);
+
+        return savedReservation;
+    }
+
+    @Override
+    public void delete(Long meetingRoomId, Long id) {
+        List<Reservation> reservationList = reservations.get(meetingRoomId);
+
+        if (reservationList == null) {
+            throw new MeetingRoomNotFoundException();
+        }
+
+        Reservation target = reservationList.stream()
+                                            .filter(reservation -> reservation.isEqualId(id))
+                                            .findAny()
+                                            .orElseThrow(ReservationNotFoundException::new);
+
+        reservationList.remove(target);
+    }
+
+    @Override
+    public Reservations findAll(Long meetingRoomId) {
+        List<Reservation> reservationList = reservations.get(meetingRoomId);
+        MeetingRoomId warppingMeetingRoomId = MeetingRoomId.create(meetingRoomId);
+
+        return Reservations.create(
+                warppingMeetingRoomId,
+                Objects.requireNonNullElse(reservationList, Collections.emptyList())
+        );
+    }
+
+    public static class MeetingRoomNotFoundException extends IllegalArgumentException {
+
+        public MeetingRoomNotFoundException() {
+            super("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
+        }
+    }
+
+    public static class ReservationNotFoundException extends IllegalArgumentException {
+
+        public ReservationNotFoundException() {
+            super("지정한 ID에 대한 예약을 찾지 못했습니다.");
+        }
+    }
+}
