@@ -97,24 +97,33 @@
 ##### 전체 회의실 조회
 ```text
 GET /rooms
+GET /rooms?attendeeCount={참석 인원}
 
+Response:
 {
   "meetingRooms": [
     {
       "id": 1,
       "name": "회의실 A",
       "floor": 3,
-      "roomNumber": 1
+      "roomNumber": 1,
+      "capacity": 10
     },
     {
       "id": 2,
       "name": "회의실 B",
       "floor": 3,
-      "roomNumber": 21
+      "roomNumber": 21,
+      "capacity": 20
     }
   ]
 }
+
 ```
+
+| 파라미터          | 타입  | 필수 여부 | 설명                       |
+| ------------- | --- | ----- | ------------------------ |
+| attendeeCount | int | 선택    | 지정한 인원을 수용할 수 있는 회의실만 조회 |
 
 | 필드                        | 타입     | 설명     |
 | ------------------------- | ------ | ------ |
