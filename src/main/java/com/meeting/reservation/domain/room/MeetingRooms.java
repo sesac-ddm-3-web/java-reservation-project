@@ -22,6 +22,12 @@ public class MeetingRooms {
                      .orElseThrow(() -> new MeetingRoomNotFoundException("지정한 ID에 해당하는 회의실을 찾을 수 없습니다."));
     }
 
+    public List<MeetingRoom> findAccommodating(int attendeeCount) {
+        return values.stream()
+                     .filter(meetingRoom -> meetingRoom.canAccommodate(attendeeCount))
+                     .toList();
+    }
+
     public List<MeetingRoom> getMeetingRooms() {
         return Collections.unmodifiableList(values);
     }
