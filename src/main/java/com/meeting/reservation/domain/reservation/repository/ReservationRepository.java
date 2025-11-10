@@ -2,12 +2,13 @@ package com.meeting.reservation.domain.reservation.repository;
 
 import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.Reservations;
+import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 
 public interface ReservationRepository {
 
-    Reservation save(Long meetingRoomId, Reservation reservation);
+    Reservation save(Reservation reservation);
 
-    void delete(Long meetingRoomId, Long id);
+    void delete(MeetingRoomId meetingRoomId, Long id);
 
-    Reservations findAll(Long meetingRoomId);
+    Reservations findAll(MeetingRoomId meetingRoomId);
 }

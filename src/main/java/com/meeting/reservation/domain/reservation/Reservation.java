@@ -2,6 +2,7 @@ package com.meeting.reservation.domain.reservation;
 
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
+import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.EqualsAndHashCode;
@@ -12,15 +13,21 @@ import lombok.Getter;
 public class Reservation {
 
     private final ReservationId id;
+    private final MeetingRoomId meetingRoomId;
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final Organizer organizer;
 
-    public static Reservation create(Organizer organizer, LocalDateTime startTime, LocalDateTime endTime) {
+    public static Reservation create(
+            MeetingRoomId meetingRoomId,
+            Organizer organizer,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
         validateOrganizer(organizer);
         validateTime(startTime, endTime);
 
-        return new Reservation(ReservationId.EMPTY_RESERVATION_ID, startTime, endTime, organizer);
+        return new Reservation(ReservationId.EMPTY_RESERVATION_ID, meetingRoomId, startTime, endTime, organizer);
     }
 
     private static void validateOrganizer(Organizer organizer) {
@@ -41,8 +48,15 @@ public class Reservation {
         }
     }
 
-    private Reservation(ReservationId id, LocalDateTime startTime, LocalDateTime endTime, Organizer organizer) {
+    private Reservation(
+            ReservationId id,
+            MeetingRoomId meetingRoomId,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            Organizer organizer
+    ) {
         this.id = id;
+        this.meetingRoomId = meetingRoomId;
         this.startTime = startTime;
         this.endTime = endTime;
         this.organizer = organizer;
@@ -51,7 +65,7 @@ public class Reservation {
     public Reservation withAssignedId(Long id) {
         ReservationId reservationId = ReservationId.create(id);
 
-        return new Reservation(reservationId, this.startTime, this.endTime, this.organizer);
+        return new Reservation(reservationId, this.meetingRoomId, this.startTime, this.endTime, this.organizer);
     }
 
     public boolean overlapTime(Reservation other) {

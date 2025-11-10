@@ -23,7 +23,7 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
 
         // when
         Reservations actual = Reservations.create(meetingRoomId, List.of(reservation));
@@ -39,14 +39,14 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
         LocalDateTime targetStartTime = LocalDateTime.now().plusDays(1L);
         LocalDateTime targetEndTime = targetStartTime.plusSeconds(1L);
-        Reservation targetReservation = Reservation.create(targetOrganizer, targetStartTime, targetEndTime)
-                                                  .withAssignedId(2L);
+        Reservation targetReservation = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime, targetEndTime)
+                                                   .withAssignedId(2L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
 
@@ -61,13 +61,13 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
         LocalDateTime targetStartTime = LocalDateTime.now().plusDays(1L);
         LocalDateTime targetEndTime = targetStartTime.plusSeconds(1L);
-        Reservation targetReservation = Reservation.create(targetOrganizer, targetStartTime, targetEndTime)
+        Reservation targetReservation = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime, targetEndTime)
                                                    .withAssignedId(1L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
@@ -84,11 +84,11 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
-        Reservation targetReservation = Reservation.create(targetOrganizer, startTime, endTime)
+        Reservation targetReservation = Reservation.create(meetingRoomId, targetOrganizer, startTime, endTime)
                                                    .withAssignedId(2L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
@@ -106,7 +106,7 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
@@ -124,7 +124,7 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
@@ -142,7 +142,7 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));
@@ -160,7 +160,7 @@ class ReservationsTest {
         Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
                                              .withAssignedId(1L);
 
         Reservations reservations = Reservations.create(meetingRoomId, List.of(reservation));

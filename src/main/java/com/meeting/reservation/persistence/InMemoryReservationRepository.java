@@ -17,21 +17,21 @@ import org.springframework.stereotype.Repository;
 public class InMemoryReservationRepository implements ReservationRepository {
 
     private final AtomicLong idGenerator = new AtomicLong(1L);
-    private final Map<Long, List<Reservation>> reservations = new ConcurrentHashMap<>();
+    private final Map<MeetingRoomId, List<Reservation>> reservations = new ConcurrentHashMap<>();
 
     @Override
-    public Reservation save(Long meetingRoomId, Reservation reservation) {
+    public Reservation save(Reservation reservation) {
         Long reservationId = idGenerator.getAndAdd(1L);
         Reservation savedReservation = reservation.withAssignedId(reservationId);
 
-        reservations.computeIfAbsent(meetingRoomId, key -> new CopyOnWriteArrayList<>())
+        reservations.computeIfAbsent(reservation.getMeetingRoomId(), key -> new CopyOnWriteArrayList<>())
                     .add(savedReservation);
 
         return savedReservation;
     }
 
     @Override
-    public void delete(Long meetingRoomId, Long id) {
+    public void delete(MeetingRoomId meetingRoomId, Long id) {
         List<Reservation> reservationList = reservations.get(meetingRoomId);
 
         if (reservationList == null) {
@@ -47,12 +47,11 @@ public class InMemoryReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public Reservations findAll(Long meetingRoomId) {
+    public Reservations findAll(MeetingRoomId meetingRoomId) {
         List<Reservation> reservationList = reservations.get(meetingRoomId);
-        MeetingRoomId warppingMeetingRoomId = MeetingRoomId.create(meetingRoomId);
 
         return Reservations.create(
-                warppingMeetingRoomId,
+                meetingRoomId,
                 Objects.requireNonNullElse(reservationList, Collections.emptyList())
         );
     }
