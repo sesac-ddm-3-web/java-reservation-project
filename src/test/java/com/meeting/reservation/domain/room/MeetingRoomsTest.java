@@ -19,7 +19,7 @@ class MeetingRoomsTest {
     void 회의실_목록을_생성한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
 
         // when
@@ -36,7 +36,7 @@ class MeetingRoomsTest {
     void 회의실_ID로_회의실을_조회한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 
@@ -51,7 +51,7 @@ class MeetingRoomsTest {
     void 존재하지_않는_회의실_ID로_조회할_수_없다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 
@@ -65,7 +65,7 @@ class MeetingRoomsTest {
     void 회의실_위치로_회의실을_조회한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 
@@ -80,7 +80,7 @@ class MeetingRoomsTest {
     void 존재하지_않는_회의실_위치로_회의실을_조회할_수_없다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 
@@ -94,7 +94,7 @@ class MeetingRoomsTest {
     void 회의실_이름으로_회의실을_조회한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 
@@ -109,7 +109,7 @@ class MeetingRoomsTest {
     void 존재하지_않는_회의실_이름으로_회의실을_조회할_수_없다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
         MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
 

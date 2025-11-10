@@ -23,7 +23,7 @@ class MeetingRoomTest {
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
 
         // when
-        MeetingRoom actual = MeetingRoom.create("학습실1", location);
+        MeetingRoom actual = MeetingRoom.create("학습실1", 5, location);
 
         // then
         assertAll(
@@ -37,7 +37,7 @@ class MeetingRoomTest {
     @NullAndEmptySource
     void 회의실_이름이_비어서는_안_된다(String name) {
         // when & then
-        assertThatThrownBy(() -> MeetingRoom.create(name, MeetingRoomLocation.create(1, 1)))
+        assertThatThrownBy(() -> MeetingRoom.create(name, 5, MeetingRoomLocation.create(1, 1)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("회의실 이름은 비어 있을 수 없습니다.");
     }
@@ -45,16 +45,25 @@ class MeetingRoomTest {
     @Test
     void 회의실_위치는_비어서는_안_된다() {
         // when & then
-        assertThatThrownBy(() -> MeetingRoom.create("학습실1", null))
+        assertThatThrownBy(() -> MeetingRoom.create("학습실1", 5, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("회의실 위치는 비어 있을 수 없습니다.");
+    }
+
+    @ParameterizedTest(name = "{0}일 때 생성할 수 없다.")
+    @ValueSource(ints = {0, -1})
+    void 회의실_최대_수용_인원은_양수여야_한다(int capacity) {
+        // when & then
+        assertThatThrownBy(() -> MeetingRoom.create("학습실1", capacity, MeetingRoomLocation.create(1, 1)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("회의실 최대 수용 인원은 양수여야 합니다.");
     }
 
     @Test
     void 유효한_회의실_ID를_초기화한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when
         MeetingRoom actual = meetingRoom.withAssignedId(1L);
@@ -68,7 +77,7 @@ class MeetingRoomTest {
     void 유효하지_않은_회의실_ID는_초기화할_수_없다(Long id) {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when & then
         assertThatThrownBy(() -> meetingRoom.withAssignedId(id))
@@ -80,7 +89,7 @@ class MeetingRoomTest {
     void 회의실_위치를_변경한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when
         MeetingRoom actual = meetingRoom.moveLocation(MeetingRoomLocation.create(2, 2));
@@ -93,7 +102,7 @@ class MeetingRoomTest {
     void 회의실_이름을_변경한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when
         MeetingRoom actual = meetingRoom.changeName("집중학습실1");
@@ -107,7 +116,7 @@ class MeetingRoomTest {
     void 유효하지_않은_회의실_이름으로는_변경할_수_없다(String name) {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when & then
         assertThatThrownBy(() -> meetingRoom.changeName(name))
@@ -119,7 +128,7 @@ class MeetingRoomTest {
     void 회의실_ID가_동등한지_확인한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location)
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
                                              .withAssignedId(1L);
 
         // when
@@ -133,7 +142,7 @@ class MeetingRoomTest {
     void 회의실_이름이_동등한지_확인한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when
         boolean actual = meetingRoom.isEqualName("학습실1");
@@ -146,10 +155,23 @@ class MeetingRoomTest {
     void 회의실_위치가_동등한지_확인한다() {
         // given
         MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
-        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", location);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
 
         // when
         boolean actual = meetingRoom.isEqualLocation(1, 1);
+
+        // then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void 회의실에_참여_인원을_모두_수용할_수_있는지_확인한다() {
+        // given
+        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
+
+        // when
+        boolean actual = meetingRoom.canAccommodate(5);
 
         // then
         assertThat(actual).isTrue();
