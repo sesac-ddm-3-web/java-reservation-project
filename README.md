@@ -17,6 +17,12 @@
   - 회의실 위치를 변경할 수 있다.
 - 제약 조건
   - 이름, 위치는 반드시 가지고 있어야 한다.
+- VO
+  - 회의실 ID (MeetingRoomId)
+    - 회의실 ID를 표현하기 위한 VO 
+    - ID를 부여받기 전 비어 있는 ID를 표현하기 위한 VO 
+  - 회의실 위치 (MeetingRoomLocation)
+    - 회의실 위치를 표현하기 위한 VO
 
 #### 회의실 목록 (MeetingRooms)
 
