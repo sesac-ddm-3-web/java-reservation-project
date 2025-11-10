@@ -67,7 +67,8 @@ public class ReservationController {
                 meetingRoomId,
                 organizer,
                 request.startTime(),
-                request.endTime()
+                request.endTime(),
+                request.attendeeCount()
         );
 
         return ResponseEntity.created(

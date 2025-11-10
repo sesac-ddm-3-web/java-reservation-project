@@ -3,6 +3,7 @@ package com.meeting.reservation.presentation.reservation.dto.request;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 public record ReserveRequest(
@@ -13,7 +14,10 @@ public record ReserveRequest(
         LocalDateTime endTime,
 
         @NotNull
-        OrganizerRequest organizer
+        OrganizerRequest organizer,
+
+        @Positive
+        int attendeeCount
 ) {
 
     public record OrganizerRequest(

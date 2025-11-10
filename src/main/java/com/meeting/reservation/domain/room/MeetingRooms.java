@@ -15,6 +15,14 @@ public class MeetingRooms {
         this.values = values;
     }
 
+    public void validateCapacity(Long id, int attendeeCount) {
+        MeetingRoom meetingRoom = findMeetingRoom(id);
+
+        if (!meetingRoom.canAccommodate(attendeeCount)) {
+            throw new IllegalArgumentException("해당 회의실은 참가 인원을 전부 수용할 수 없습니다.");
+        }
+    }
+
     public MeetingRoom findMeetingRoom(Long id) {
         return values.stream()
                      .filter(meetingRoom -> meetingRoom.isEqualId(id))

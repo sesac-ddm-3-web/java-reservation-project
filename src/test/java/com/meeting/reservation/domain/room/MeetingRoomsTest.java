@@ -79,4 +79,18 @@ class MeetingRoomsTest {
         // then
         assertThat(actual).hasSize(2);
     }
+
+    @Test
+    void 지정한_회의실이_참가_인원을_모두_수용할_수_없다면_검증에_실패한다() {
+        // given
+        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location)
+                                              .withAssignedId(1L);
+        MeetingRooms meetingRooms = MeetingRooms.create(List.of(meetingRoom));
+
+        // when & then
+        assertThatThrownBy(() -> meetingRooms.validateCapacity(1L, 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 회의실은 참가 인원을 전부 수용할 수 없습니다.");
+    }
 }
