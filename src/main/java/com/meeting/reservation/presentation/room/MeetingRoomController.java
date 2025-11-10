@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,11 +21,14 @@ public class MeetingRoomController {
     private final MeetingRoomService meetingRoomService;
 
     @GetMapping
-    public ResponseEntity<MeetingRoomCollectionResponse> findAll() {
-        List<MeetingRoomResponse> responses = meetingRoomService.findAll()
-                                                                .stream()
-                                                                .map(this::mapToMeetingRoomResponse)
-                                                                .toList();
+    public ResponseEntity<MeetingRoomCollectionResponse> findAll(@RequestParam(required = false) Integer attendeeCount) {
+        List<MeetingRoom> meetingRooms = attendeeCount != null
+                ? meetingRoomService.findAllAccommodating(attendeeCount)
+                : meetingRoomService.findAll();
+
+        List<MeetingRoomResponse> responses = meetingRooms.stream()
+                                                          .map(this::mapToMeetingRoomResponse)
+                                                          .toList();
 
         return ResponseEntity.ok(new MeetingRoomCollectionResponse(responses));
     }
