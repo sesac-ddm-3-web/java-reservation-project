@@ -24,6 +24,14 @@
   - 회의실 위치 (MeetingRoomLocation)
     - 회의실 위치를 표현하기 위한 VO
 
+### 회의실 레포지토리 (MeetingRoomRepository)
+
+- 설명
+  - 요구사항에 회의실을 추가/삭제하는 내용이 없으므로 단순 조회 기능만 제공
+- 구현체 (InMemoryMeetingRoomRepository)
+  - 인메모리에서 회의실을 관리하는 레포지토리
+  - 생성자에서 미리 정의한 여러 개의 회의실 초기화
+
 #### 회의실 목록 (MeetingRooms)
 
 - 정보
@@ -71,3 +79,11 @@
 - 제약 조건
   - 새로운 예약은 기존의 다른 예약과 시간이 겹치지 않아야 한다.
   - 이미 사용 중인 예약이라면 취소할 수 없다.
+
+#### 예약 레포지토리 (ReservationRepository)
+
+- 설명
+  - 특정 회의실에 대한 예약을 관리하는 레포지토리
+  - 저장 / 조회 / 삭제 가능
+- 구현체 (InMemoryReservationRepository)
+  - 인메모리에서 회의실을 관리하는 레포지토리
