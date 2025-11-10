@@ -40,7 +40,7 @@ public class Reservations {
             throw new IllegalArgumentException("지금 회의실을 사용하고 있거나 이미 사용했습니다.");
         }
         if (!target.matchPassword(password)) {
-            throw new IllegalArgumentException("예약 비밀번호가 일치하지 않습니다.");
+            throw new InvalidReservationPasswordException();
         }
     }
 
@@ -56,6 +56,13 @@ public class Reservations {
 
         public ReservationNotFoundException() {
             super("지정한 ID에 해당하는 예약을 찾을 수 없습니다.");
+        }
+    }
+
+    public static class InvalidReservationPasswordException extends IllegalArgumentException {
+
+        public InvalidReservationPasswordException() {
+            super("예약 비밀번호가 일치하지 않습니다.");
         }
     }
 }
