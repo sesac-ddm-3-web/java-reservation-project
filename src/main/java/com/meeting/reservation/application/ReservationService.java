@@ -51,6 +51,13 @@ public class ReservationService {
                                     .getReservations();
     }
 
+    public Reservation findReservation(Long meetingRoomId, Long reservationId) {
+        MeetingRooms meetingRooms = meetingRoomRepository.findAll();
+        MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
+
+        return reservationRepository.find(meetingRoom.getId(), reservationId);
+    }
+
     public void cancelReservation(Long meetingRoomId, Long reservationId, String password) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
