@@ -8,7 +8,6 @@ import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
-import com.meeting.reservation.domain.room.MeetingRooms;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomLocation;
 import com.meeting.reservation.persistence.InMemoryReservationRepository;
@@ -30,14 +29,13 @@ class ReservationFactoryTest {
     @Test
     void 예약을_생성한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
 
         // when
         Reservation actual = reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 5
@@ -55,13 +53,12 @@ class ReservationFactoryTest {
     @Test
     void 예약자_정보가_없으면_예외가_발생한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         TimeSlot timeSlot = createTimeSlot();
 
         // when & then
         assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 null,
                 timeSlot,
                 5
@@ -73,13 +70,12 @@ class ReservationFactoryTest {
     @Test
     void 예약_시간이_없으면_예외가_발생한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
 
         // when & then
         assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 null,
                 5
@@ -92,14 +88,13 @@ class ReservationFactoryTest {
     @ValueSource(ints = {0, -1})
     void 참가_인원이_양수가_아니면_예외가_발생한다(int attendeeCount) {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
 
         // when & then
         assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 attendeeCount
@@ -111,14 +106,13 @@ class ReservationFactoryTest {
     @Test
     void 회의실_수용_인원을_초과하면_예외가_발생한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
 
         // when & then
         assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 100
@@ -130,7 +124,7 @@ class ReservationFactoryTest {
     @Test
     void 예약_시간이_중복되면_예외가_발생한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         TimeSlot timeSlot = createTimeSlot();
         Organizer organizer = createOrganizer();
 
@@ -145,8 +139,7 @@ class ReservationFactoryTest {
 
         // when & then
         assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 5
@@ -156,35 +149,15 @@ class ReservationFactoryTest {
     }
 
     @Test
-    void 존재하지_않는_회의실로_예약하면_예외가_발생한다() {
-        // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
-        Organizer organizer = createOrganizer();
-        TimeSlot timeSlot = createTimeSlot();
-
-        // when & then
-        assertThatThrownBy(() -> reservationFactory.create(
-                meetingRooms,
-                999L,
-                organizer,
-                timeSlot,
-                5
-        ))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("지정한 ID에 해당하는 회의실을 찾을 수 없습니다.");
-    }
-
-    @Test
     void 반복_예약을_생성한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
 
         // when
         List<Reservation> actual = reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 5,
@@ -199,7 +172,7 @@ class ReservationFactoryTest {
     @Test
     void 반복_예약이_올바른_간격으로_생성된다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = TimeSlot.create(
                 LocalDateTime.of(2025, 11, 11, 10, 0),
@@ -208,8 +181,7 @@ class ReservationFactoryTest {
 
         // when
         List<Reservation> actual = reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 5,
@@ -228,14 +200,13 @@ class ReservationFactoryTest {
     @Test
     void 반복_예약의_모든_예약이_같은_정보를_공유한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
 
         // when
         List<Reservation> actual = reservationFactory.create(
-                meetingRooms,
-                1L,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 5,
@@ -251,15 +222,14 @@ class ReservationFactoryTest {
         );
     }
 
-    private MeetingRooms createMeetingRooms(Long meetingRoomId) {
-        MeetingRoom meetingRoom = MeetingRoom.create(
-                                                     "회의실 A",
-                                                     10,
-                                                     MeetingRoomLocation.create(3, 1)
-                                             )
-                                             .withAssignedId(meetingRoomId);
-
-        return MeetingRooms.create(List.of(meetingRoom));
+    // 헬퍼 메서드
+    private MeetingRoom createMeetingRoom(Long meetingRoomId) {
+        return MeetingRoom.create(
+                                  "회의실 A",
+                                  10,
+                                  MeetingRoomLocation.create(3, 1)
+                          )
+                          .withAssignedId(meetingRoomId);
     }
 
     private Organizer createOrganizer() {
@@ -269,7 +239,6 @@ class ReservationFactoryTest {
     private TimeSlot createTimeSlot() {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-
         return TimeSlot.create(startTime, endTime);
     }
 }

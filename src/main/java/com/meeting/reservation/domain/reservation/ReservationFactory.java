@@ -5,7 +5,6 @@ import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
-import com.meeting.reservation.domain.room.MeetingRooms;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +17,11 @@ public final class ReservationFactory {
     private final ReservationRepository reservationRepository;
 
     public Reservation create(
-            MeetingRooms meetingRooms,
-            Long meetingRoomId,
+            MeetingRoom meetingRoom,
             Organizer organizer,
             TimeSlot timeSlot,
             int attendeeCount
     ) {
-        MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
-
         meetingRoom.validateAttendeeCount(attendeeCount);
 
         Reservations reservations = reservationRepository.findAll(meetingRoom.getId());
@@ -48,8 +44,7 @@ public final class ReservationFactory {
     }
 
     public List<Reservation> create(
-            MeetingRooms meetingRooms,
-            Long meetingRoomId,
+            MeetingRoom meetingRoom,
             Organizer organizer,
             TimeSlot timeSlot,
             int attendeeCount,
@@ -57,8 +52,7 @@ public final class ReservationFactory {
             int repeatCount
     ) {
         Reservation startReservation = this.create(
-                meetingRooms,
-                meetingRoomId,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 attendeeCount

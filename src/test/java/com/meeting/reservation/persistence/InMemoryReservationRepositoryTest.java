@@ -10,7 +10,6 @@ import com.meeting.reservation.domain.reservation.Reservations;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
-import com.meeting.reservation.domain.room.MeetingRooms;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomLocation;
 import com.meeting.reservation.persistence.InMemoryReservationRepository.MeetingRoomNotFoundException;
@@ -31,10 +30,10 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 예약을_저장한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
 
         // when
         Reservation actual = repository.save(reservation);
@@ -46,15 +45,15 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 예약을_저장할_때마다_ID가_자동으로_증가한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot1 = createTimeSlot();
         TimeSlot timeSlot2 = TimeSlot.create(
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot2, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
 
         // when
         Reservation saved1 = repository.save(reservation1);
@@ -70,7 +69,7 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 여러_예약을_한_번에_저장한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot1 = createTimeSlot();
         TimeSlot timeSlot2 = TimeSlot.create(
@@ -81,9 +80,9 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(2L),
                 LocalDateTime.now().plusDays(2L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot2, 5);
-        Reservation reservation3 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot3, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
+        Reservation reservation3 = reservationFactory.create(meetingRoom, organizer, timeSlot3, 5);
 
         // when
         List<Reservation> actual = repository.saveAll(List.of(reservation1, reservation2, reservation3));
@@ -95,15 +94,15 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 여러_예약을_저장할_때_각각_ID가_증가한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot1 = createTimeSlot();
         TimeSlot timeSlot2 = TimeSlot.create(
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot2, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
 
         // when
         List<Reservation> actual = repository.saveAll(List.of(reservation1, reservation2));
@@ -118,10 +117,10 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 예약을_삭제한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
         Reservation saved = repository.save(reservation);
 
         // when
@@ -143,10 +142,10 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 존재하지_않는_예약_ID로는_예약을_삭제할_수_없다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
         repository.save(reservation);
 
         // when & then
@@ -167,15 +166,15 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 회의실의_모든_예약을_조회한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot1 = createTimeSlot();
         TimeSlot timeSlot2 = TimeSlot.create(
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot2, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
         repository.save(reservation1);
         repository.save(reservation2);
 
@@ -189,8 +188,8 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 회의실별로_독립적인_예약_목록을_관리한다() {
         // given
-        MeetingRooms meetingRooms1 = createMeetingRooms(1L);
-        MeetingRooms meetingRooms2 = createMeetingRooms(2L);
+        MeetingRoom meetingRoom1 = createMeetingRoom(1L);
+        MeetingRoom meetingRoom2 = createMeetingRoom(2L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot1 = createTimeSlot();
         TimeSlot timeSlot2 = TimeSlot.create(
@@ -201,9 +200,9 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(2L),
                 LocalDateTime.now().plusDays(2L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRooms1, 1L, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRooms1, 1L, organizer, timeSlot2, 5);
-        Reservation reservation3 = reservationFactory.create(meetingRooms2, 2L, organizer, timeSlot3, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom1, organizer, timeSlot1, 5);
+        Reservation reservation2 = reservationFactory.create(meetingRoom1, organizer, timeSlot2, 5);
+        Reservation reservation3 = reservationFactory.create(meetingRoom2, organizer, timeSlot3, 5);
 
         // when
         repository.save(reservation1);
@@ -223,10 +222,10 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 예약을_조회한다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
         Reservation saved = repository.save(reservation);
 
         // when
@@ -247,10 +246,10 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 존재하지_않는_예약_ID로는_예약을_조회할_수_없다() {
         // given
-        MeetingRooms meetingRooms = createMeetingRooms(1L);
+        MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRooms, 1L, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
         repository.save(reservation);
 
         // when & then
@@ -259,15 +258,14 @@ class InMemoryReservationRepositoryTest {
                 .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
     }
 
-    private MeetingRooms createMeetingRooms(Long meetingRoomId) {
-        MeetingRoom meetingRoom = MeetingRoom.create(
-                                                     "회의실 A",
-                                                     10,
-                                                     MeetingRoomLocation.create(3, 1)
-                                             )
-                                             .withAssignedId(meetingRoomId);
-
-        return MeetingRooms.create(List.of(meetingRoom));
+    // 헬퍼 메서드
+    private MeetingRoom createMeetingRoom(Long meetingRoomId) {
+        return MeetingRoom.create(
+                                  "회의실 A",
+                                  10,
+                                  MeetingRoomLocation.create(3, 1)
+                          )
+                          .withAssignedId(meetingRoomId);
     }
 
     private Organizer createOrganizer() {
@@ -277,7 +275,6 @@ class InMemoryReservationRepositoryTest {
     private TimeSlot createTimeSlot() {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-
         return TimeSlot.create(startTime, endTime);
     }
 }

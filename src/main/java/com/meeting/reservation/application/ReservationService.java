@@ -34,10 +34,12 @@ public class ReservationService {
             int attendeeCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
+        MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
+
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
+
         Reservation reservation = reservationFactory.create(
-                meetingRooms,
-                meetingRoomId,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 attendeeCount
@@ -57,11 +59,11 @@ public class ReservationService {
             int repeatCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
+        MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
         ReservationFrequency reservationFrequency = ReservationFrequency.find(frequencyName);
         List<Reservation> reservations = reservationFactory.create(
-                meetingRooms,
-                meetingRoomId,
+                meetingRoom,
                 organizer,
                 timeSlot,
                 attendeeCount,
