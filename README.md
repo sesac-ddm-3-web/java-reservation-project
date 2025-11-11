@@ -79,30 +79,40 @@ README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝
 - **[API]** 전체 회의실 목록을 조회하는 API를 구현해야 합니다.
   - 요청
     ```
-    GET /meeting-rooms
+    GET /meeting-rooms?capacity={value}
     ```
   - 응답
     - 성공
       ```
       HTTP 200 OK
       {
-        "meetingRooms": [
-          {
-            "id": 1,
-            "name": "회의실 01",
-            "capacity": 2
-          },
-          {
-            "id": 2,
-            "name": "회의실 02",
-            "capacity": 6
-          },
-          {
-            "id": 3,
-            "name": "회의실 03",
-            "capacity": 10
-          }
-        ]
+          "meetingRooms": [
+              {
+                  "id": 1,
+                  "name": "회의실 A",
+                  "capacity": 2
+              },
+              {
+                  "id": 2,
+                  "name": "회의실 B",
+                  "capacity": 2
+              },
+              {
+                  "id": 3,
+                  "name": "회의실 C",
+                  "capacity": 3
+              },
+              {
+                  "id": 4,
+                  "name": "회의실 D",
+                  "capacity": 4
+              },
+              {
+                  "id": 5,
+                  "name": "회의실 E",
+                  "capacity": 8
+              }
+          ]
       }
       ```
 
@@ -127,19 +137,23 @@ README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝
   - 요청
     ```
     POST /meeting-rooms/{room_id}/reservations
-    
     {
-      "client": "이찬미", 
-      "phoneNumber": "010-1234-5678", 
-      "password": "1234"
-      "startTime": "2025-11-10T17:00:00",
-      "endTime": "2025-11-10T22:00:00",
+        "client": "이찬미",
+        "phoneNumber": "010-1234-5678",
+        "headcount": 1,
+        "repetitionType": "WEEKLY", 
+        "repeatCnt": 2,
+        "password": "1234",
+        "date": "2025-11-20",
+        "startTime": "15:00:00",
+        "endTime": "17:00:00"
     }
     ```
   - 응답
     - 성공
       ```
       HTTP 201 CREATED
+      예약에 성공했습니다.
       ```
   - 요구사항
     - [x] 종료 시간은 시작 시간보다 늦어야 한다.
@@ -160,22 +174,46 @@ README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝
       ```
       HTTP 200 OK
       {
-        "meetingRoomInfo": {
-          "id": 1, 
-          "name": "회의실 01", 
-          "capacity": 2
-        },
-        "reservations": [
-          {
-            "id": 1, 
-            "client": "이찬미", 
-            "phoneNumber": "010-1234-5678", 
-            "startTime": "2025-11-10T17:00:00",
-            "endTime": "2025-11-10T22:00:00", 
-            "reservedAt": "2025-11-09T23:00:00"
-          }, 
-          ...
-        ]
+          "meetingRoom": {
+              "id": 4,
+              "name": "회의실 D",
+              "capacity": 4
+          },
+          "reservations": [
+              {
+                  "id": 9,
+                  "client": "이찬미",
+                  "phoneNumber": "1234",
+                  "type": "ONCE",
+                  "repeatCnt": 1,
+                  "date": "2025-11-12",
+                  "startTime": "12:00:00",
+                  "endTime": "15:00:00",
+                  "reservedAt": "2025-11-11T15:13:21.2667532"
+              },
+              {
+                  "id": 12,
+                  "client": "이찬미",
+                  "phoneNumber": "1234",
+                  "type": "WEEKLY",
+                  "repeatCnt": 2,
+                  "date": "2025-11-20",
+                  "startTime": "15:00:00",
+                  "endTime": "17:00:00",
+                  "reservedAt": "2025-11-11T16:26:53.6833565"
+              },
+              {
+                  "id": 13,
+                  "client": "이찬미",
+                  "phoneNumber": "1234",
+                  "type": "MONTHLY",
+                  "repeatCnt": 2,
+                  "date": "2025-11-25",
+                  "startTime": "12:00:00",
+                  "endTime": "16:00:00",
+                  "reservedAt": "2025-11-11T16:38:21.7963807"
+              }
+          ]
       }
       ```
 
@@ -188,6 +226,7 @@ README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝
     - 성공
       ```
       HTTP 200 OK
+      예약 삭제에 성공했습니다.
       ```
   - 예외 처리
     - [x] 비밀번호가 일치하지 않는 경우
