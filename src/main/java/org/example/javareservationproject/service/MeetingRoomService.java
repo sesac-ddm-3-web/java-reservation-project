@@ -1,5 +1,7 @@
 package org.example.javareservationproject.service;
 
+import java.util.List;
+
 import org.example.javareservationproject.domain.meetingroom.MeetingRoom;
 import org.example.javareservationproject.domain.meetingroom.exception.MeetingRoomNotFoundException;
 import org.example.javareservationproject.domain.meetingroom.repository.MeetingRoomRepository;
@@ -22,9 +24,16 @@ public class MeetingRoomService {
     /**
      * 회의실 전체 조회
      */
-    public MeetingRoomsDto getAllMeetingRoomInfo() {
+    public MeetingRoomsDto getMeetingRoomsInfo(Integer capacity) {
+        List<MeetingRoom> meetingRooms;
+        if (capacity != null) {
+            meetingRooms = meetingRoomRepository.findByCapacity(capacity);
+        } else {
+            meetingRooms = meetingRoomRepository.findAll();
+        }
+
         return new MeetingRoomsDto(
-            meetingRoomRepository.findAll().stream()
+            meetingRooms.stream()
                 .map(MeetingRoomDto::toDto)
                 .toList()
         );

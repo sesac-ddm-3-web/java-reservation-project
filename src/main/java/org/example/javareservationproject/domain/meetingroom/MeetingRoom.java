@@ -28,6 +28,10 @@ public class MeetingRoom {
         reservations.addReservation(reservation);
     }
 
+    public boolean isOverCapacity(int headcount) {
+        return this.capacity < headcount;
+    }
+
     private void setReservations(Reservations reservations) {
         this.reservations = reservations;
     }

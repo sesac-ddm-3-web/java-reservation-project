@@ -10,4 +10,6 @@ public interface MeetingRoomRepository {
     List<MeetingRoom> findAll();
 
     Optional<MeetingRoom> findById(Long id);
+
+    List<MeetingRoom> findByCapacity(Integer capacity);
 }

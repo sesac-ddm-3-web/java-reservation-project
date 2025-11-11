@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class InMemoryMeetingRoomRepository implements MeetingRoomRepository, SnapshotRepositorySupport<MeetingRoom> {
 
     private static final List<MeetingRoom> DB = new CopyOnWriteArrayList<>();
-    private static final AtomicLong SEQUENCE = new AtomicLong();
+    private static final AtomicLong SEQUENCE = new AtomicLong(1);
 
     private final String storageKey = "meeting_rooms";
     private final SnapshotStorage<MeetingRoom> storage;
@@ -35,6 +35,13 @@ public class InMemoryMeetingRoomRepository implements MeetingRoomRepository, Sna
         return DB.stream()
             .filter(room -> room.getId().equals(id))
             .findFirst();
+    }
+
+    @Override
+    public List<MeetingRoom> findByCapacity(Integer capacity) {
+        return DB.stream()
+            .filter(room -> !room.isOverCapacity(capacity))
+            .toList();
     }
 
     /**

@@ -47,10 +47,13 @@ public class Reservation implements Comparable<Reservation> {
 
     @Override
     public int compareTo(Reservation o) {
-        if (this.time.getStartTime().equals(o.time.getStartTime())) {
-            return 0;
+        // 날짜, 시작 시간 오름차순
+        int dateCompare = this.time.getDate().compareTo(o.time.getDate());
+        if (dateCompare != 0) {
+            return dateCompare;
         }
-        return this.time.getStartTime().isBefore(o.time.getStartTime()) ? -1 : 1;
+
+        return this.time.getStartTime().compareTo(o.time.getStartTime());
     }
 }
 

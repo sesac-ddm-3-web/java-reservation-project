@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class InMemoryReservationRepository implements ReservationRepository, SnapshotRepositorySupport<Reservation> {
 
     private static final List<Reservation> DB = new CopyOnWriteArrayList<>();
-    private static final AtomicLong SEQUENCE = new AtomicLong();
+    private static final AtomicLong SEQUENCE = new AtomicLong(1);
 
     private final String storageKey = "reservations";
     private final SnapshotStorage<Reservation> storage;

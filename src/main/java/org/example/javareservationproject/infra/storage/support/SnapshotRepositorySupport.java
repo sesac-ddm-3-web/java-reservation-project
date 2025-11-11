@@ -22,7 +22,7 @@ public interface SnapshotRepositorySupport<T> {
                 b.sequence().set(snap.sequence());
             });
 
-        log.info("[Snapshot] Loaded '{}' data. (cnt={})", b.storageKey(), b.db().size());
+        log.info("[Snapshot] Loaded '{}' data. ({} entities)", b.storageKey(), b.db().size());
     }
 
     default void writeSnapshot() {
@@ -32,6 +32,6 @@ public interface SnapshotRepositorySupport<T> {
         long seqValue = b.sequence().get();
         b.storage().save(b.storageKey(), new Snapshot<>(seqValue, List.copyOf(b.db())));
 
-        log.info("[Snapshot] Saved '{}' data. (cnt={})", b.storageKey(), b.db().size());
+        log.info("[Snapshot] Saved '{}' data. ({} entities)", b.storageKey(), b.db().size());
     }
 }
