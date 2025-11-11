@@ -29,15 +29,11 @@ public class ReservationService {
     public ReservationId reserve(
             Long meetingRoomId,
             Organizer organizer,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
+            TimeSlot timeSlot,
             int attendeeCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
-
-        TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
-
         Reservation reservation = reservationFactory.create(
                 meetingRoom,
                 organizer,
@@ -52,15 +48,13 @@ public class ReservationService {
     public void repeatReserve(
             Long meetingRoomId,
             Organizer organizer,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
+            TimeSlot timeSlot,
             int attendeeCount,
             String frequencyName,
             int repeatCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
-        TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
         ReservationFrequency reservationFrequency = ReservationFrequency.find(frequencyName);
         List<Reservation> reservations = reservationFactory.create(
                 meetingRoom,

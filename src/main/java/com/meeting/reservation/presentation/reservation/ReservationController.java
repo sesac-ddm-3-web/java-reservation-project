@@ -4,6 +4,7 @@ import com.meeting.reservation.application.ReservationService;
 import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
+import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.presentation.reservation.dto.request.CancelReservationRequest;
 import com.meeting.reservation.presentation.reservation.dto.request.RepeatReserveRequest;
 import com.meeting.reservation.presentation.reservation.dto.request.ReserveRequest;
@@ -44,11 +45,11 @@ public class ReservationController {
                 request.organizer().phoneNumber(),
                 request.organizer().password()
         );
+        TimeSlot timeSlot = TimeSlot.create(request.startTime(), request.endTime());
         ReservationId reservationId = reservationService.reserve(
                 meetingRoomId,
                 organizer,
-                request.startTime(),
-                request.endTime(),
+                timeSlot,
                 request.attendeeCount()
         );
         URI location = URI.create("/rooms/" + meetingRoomId + "/reservations" + reservationId.getValue());
@@ -67,12 +68,12 @@ public class ReservationController {
                 request.organizer().phoneNumber(),
                 request.organizer().password()
         );
+        TimeSlot timeSlot = TimeSlot.create(request.startTime(), request.endTime());
 
         reservationService.repeatReserve(
                 meetingRoomId,
                 organizer,
-                request.startTime(),
-                request.endTime(),
+                timeSlot,
                 request.attendeeCount(),
                 request.frequency(),
                 request.repeatCount()
