@@ -91,6 +91,14 @@
 - 구현체 (InMemoryReservationRepository)
   - 인메모리에서 예약을 관리하는 레포지토리
 
+### 팩토리 
+
+#### 예약 팩토리 (ReservationFactory)
+
+- 설명
+  - Reservation 생성 시 검증 및 조립을 수행하는 팩토리 
+  - 내부적으로 레포지토리를 통해 일급 컬렉션을 조회해 검증 로직 수행
+
 ### API
 
 #### 회의실 
@@ -239,6 +247,42 @@ Location: /rooms/{meetingRoomId}/reservations/{reservationId}
 | organizer.name        | String        | 필수    | 이름           |
 | organizer.phoneNumber | String        | 필수    | 전화번호         |
 | organizer.password    | String        | 필수    | 비밀번호         |
+
+##### 회의실 반복 예약 
+```text
+POST /rooms/{meetingRoomId}/reservations/repeat
+
+Request:
+{
+  "startTime": "2025-11-11T10:00:00",
+  "endTime": "2025-11-11T12:00:00",
+  "organizer": {
+    "name": "홍길동",
+    "phoneNumber": "010-1234-5678",
+    "password": "1234"
+  },
+  "attendeeCount": 5,
+  "frequency": "WEEKLY",
+  "repeatCount": 4
+}
+
+Response:
+201 Created
+Location: /rooms/{meetingRoomId}/reservations
+
+```
+
+| 필드                    | 타입            | 필수 여부 | 설명                                     |
+| --------------------- | ------------- | ----- | -------------------------------------- |
+| startTime             | LocalDateTime | 필수    | 회의실 사용 시작 시간                           |
+| endTime               | LocalDateTime | 필수    | 회의실 사용 종료 시간                           |
+| organizer             | Object        | 필수    | 비회원 예약자 정보                             |
+| organizer.name        | String        | 필수    | 이름                                     |
+| organizer.phoneNumber | String        | 필수    | 전화번호                                   |
+| organizer.password    | String        | 필수    | 비밀번호                                   |
+| attendeeCount         | Integer       | 필수    | 참가 인원 (양수)                             |
+| frequency             | String        | 필수    | 반복 주기 (DAILY, WEEKLY, MONTHLY, YEARLY) |
+| repeatCount           | Integer       | 필수    | 반복 횟수 (양수)                             |
 
 ##### 회의실 예약 취소
 
