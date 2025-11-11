@@ -1,0 +1,30 @@
+{
+  "sequence" : 5,
+  "items" : [ {
+    "id" : 0,
+    "meetingRoomId" : 1,
+    "time" : {
+      "startTime" : "2025-11-10T17:00:00",
+      "endTime" : "2025-11-10T22:00:00"
+    },
+    "info" : {
+      "client" : "이찬미",
+      "phoneNumber" : "010-1234-5678",
+      "password" : "1234"
+    },
+    "reservedAt" : "2025-11-10T22:34:06.2338511"
+  }, {
+    "id" : 2,
+    "meetingRoomId" : 1,
+    "time" : {
+      "startTime" : "2025-11-09T17:00:00",
+      "endTime" : "2025-11-09T22:00:00"
+    },
+    "info" : {
+      "client" : "이찬미",
+      "phoneNumber" : "010-1234-5678",
+      "password" : "1234"
+    },
+    "reservedAt" : "2025-11-10T22:40:34.4882807"
+  } ]
+}
