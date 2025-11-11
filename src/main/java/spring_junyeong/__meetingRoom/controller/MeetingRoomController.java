@@ -2,34 +2,25 @@ package spring_junyeong.__meetingRoom.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import spring_junyeong.__meetingRoom.domain.MeetingRoom;
-import spring_junyeong.__meetingRoom.domain.Reservation;
+import spring_junyeong.__meetingRoom.domain.dto.MeetingRoomResponseDto;
 import spring_junyeong.__meetingRoom.service.MeetingRoomService;
-import spring_junyeong.__meetingRoom.service.ReservationService;
 
 import java.util.List;
 
 @RestController
 public class MeetingRoomController {
 
-    private MeetingRoomService meetingRoomService;
-    private ReservationService reservationService;
+    private final MeetingRoomService meetingRoomService;
 
     @Autowired
-    MeetingRoomController(MeetingRoomService meetingRoomService, ReservationService reservationService) {
+    MeetingRoomController(MeetingRoomService meetingRoomService) {
         this.meetingRoomService = meetingRoomService;
-        this.reservationService = reservationService;
     }
 
-    @RequestMapping(value = "/meetingRoom", method = RequestMethod.GET)
-    public List<MeetingRoom> getMeetingRoomList(){
+    // 미팅룸 - 전체 조회
+    @RequestMapping(value = "/rooms", method = RequestMethod.GET)
+    public List<MeetingRoomResponseDto> getMeetingRoomList(){
         return meetingRoomService.getMeetingRoomList();
     }
-
-    @RequestMapping(value = "/meetingRoom/{id}", method = RequestMethod.GET)
-    public List<MeetingRoom> getMeetingRoomById(@PathVariable String id){
-        return meetingRoomService.getMeetingRoomById(id);
-    }
-
 
 }
