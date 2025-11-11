@@ -27,7 +27,7 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // when
         Reservation actual = repository.save(reservation);
@@ -44,8 +44,8 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation1 = Reservation.create(meetingRoomId, organizer, startTime, endTime);
-        Reservation reservation2 = Reservation.create(meetingRoomId, organizer, startTime.plusDays(1L), endTime.plusDays(1L));
+        Reservation reservation1 = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation reservation2 = Reservation.create(meetingRoomId, organizer, startTime.plusDays(1L), endTime.plusDays(1L), 5);
 
         // when
         Reservation saved1 = repository.save(reservation1);
@@ -66,7 +66,7 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
         Reservation saved = repository.save(reservation);
 
         // when
@@ -97,7 +97,7 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
         repository.save(reservation);
 
         // when & then
@@ -127,8 +127,8 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation1 = Reservation.create(meetingRoomId, organizer, startTime, endTime);
-        Reservation reservation2 = Reservation.create(meetingRoomId, organizer, startTime.plusDays(1L), endTime.plusDays(1L));
+        Reservation reservation1 = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation reservation2 = Reservation.create(meetingRoomId, organizer, startTime.plusDays(1L), endTime.plusDays(1L), 5);
         repository.save(reservation1);
         repository.save(reservation2);
 
@@ -148,9 +148,9 @@ class InMemoryReservationRepositoryTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusHours(1L);
-        Reservation reservation1 = Reservation.create(meetingRoomId1, organizer, startTime, endTime);
-        Reservation reservation2 = Reservation.create(meetingRoomId1, organizer, startTime.plusDays(1L), endTime.plusDays(1L));
-        Reservation reservation3 = Reservation.create(meetingRoomId2, organizer, startTime.plusDays(2L), endTime.plusDays(2L));
+        Reservation reservation1 = Reservation.create(meetingRoomId1, organizer, startTime, endTime, 5);
+        Reservation reservation2 = Reservation.create(meetingRoomId1, organizer, startTime.plusDays(1L), endTime.plusDays(1L), 5);
+        Reservation reservation3 = Reservation.create(meetingRoomId2, organizer, startTime.plusDays(2L), endTime.plusDays(2L), 5);
 
         // when
         repository.save(reservation1);

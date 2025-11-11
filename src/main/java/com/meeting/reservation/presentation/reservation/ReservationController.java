@@ -47,6 +47,7 @@ public class ReservationController {
                 reservation.getId().getValue(),
                 reservation.getStartTime(),
                 reservation.getEndTime(),
+                reservation.getAttendeeCount(),
                 organizerResponse
         );
     }

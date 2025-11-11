@@ -16,18 +16,28 @@ public class Reservation {
     private final MeetingRoomId meetingRoomId;
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
+    private final int attendeeCount;
     private final Organizer organizer;
 
     public static Reservation create(
             MeetingRoomId meetingRoomId,
             Organizer organizer,
             LocalDateTime startTime,
-            LocalDateTime endTime
+            LocalDateTime endTime,
+            int attendeeCount
     ) {
         validateOrganizer(organizer);
         validateTime(startTime, endTime);
+        validateAttendeeCount(attendeeCount);
 
-        return new Reservation(ReservationId.EMPTY_RESERVATION_ID, meetingRoomId, startTime, endTime, organizer);
+        return new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                startTime,
+                endTime,
+                attendeeCount,
+                organizer
+        );
     }
 
     private static void validateOrganizer(Organizer organizer) {
@@ -48,24 +58,39 @@ public class Reservation {
         }
     }
 
+    private static void validateAttendeeCount(int attendeeCount) {
+        if (attendeeCount <= 0) {
+            throw new IllegalArgumentException("참가 인원은 양수여야 합니다.");
+        }
+    }
+
     private Reservation(
             ReservationId id,
             MeetingRoomId meetingRoomId,
             LocalDateTime startTime,
             LocalDateTime endTime,
+            int attendeeCount,
             Organizer organizer
     ) {
         this.id = id;
         this.meetingRoomId = meetingRoomId;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.attendeeCount = attendeeCount;
         this.organizer = organizer;
     }
 
     public Reservation withAssignedId(Long id) {
         ReservationId reservationId = ReservationId.create(id);
 
-        return new Reservation(reservationId, this.meetingRoomId, this.startTime, this.endTime, this.organizer);
+        return new Reservation(
+                reservationId,
+                this.meetingRoomId,
+                this.startTime,
+                this.endTime,
+                this.attendeeCount,
+                this.organizer
+        );
     }
 
     public boolean overlapTime(Reservation other) {

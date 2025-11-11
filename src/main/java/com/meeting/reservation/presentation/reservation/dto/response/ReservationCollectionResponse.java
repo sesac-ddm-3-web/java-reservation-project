@@ -9,6 +9,7 @@ public record ReservationCollectionResponse(List<ReservationResponse> reservatio
             Long id,
             LocalDateTime startTime,
             LocalDateTime endTime,
+            int attendeeCount,
             OrganizerResponse organizer
     ) {
     }

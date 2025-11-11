@@ -35,7 +35,7 @@ public class ReservationService {
 
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
         Reservations reservations = reservationRepository.findAll(meetingRoom.getId());
-        Reservation reservation = Reservation.create(meetingRoom.getId(), organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoom.getId(), organizer, startTime, endTime, attendeeCount);
 
         reservations.validateReserve(reservation);
 

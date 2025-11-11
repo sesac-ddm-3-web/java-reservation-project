@@ -25,7 +25,7 @@ class ReservationTest {
         LocalDateTime endTime = startTime.plusSeconds(1L);
 
         // when
-        Reservation actual = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation actual = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // then
         assertThat(actual).isInstanceOf(Reservation.class);
@@ -39,7 +39,7 @@ class ReservationTest {
         LocalDateTime endTime = startTime.plusSeconds(1L);
 
         // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, null, startTime, endTime))
+        assertThatThrownBy(() -> Reservation.create(meetingRoomId, null, startTime, endTime, 5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약자 정보는 비어 있을 수 없습니다.");
     }
@@ -51,7 +51,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
 
         // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, null, null))
+        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, null, null, 5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 시간 정보는 비어 있을 수 없습니다.");
     }
@@ -65,9 +65,24 @@ class ReservationTest {
         LocalDateTime startTime = endTime.plusSeconds(1L);
 
         // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, startTime, endTime))
+        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, startTime, endTime, 5))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 시작 시간은 예약 종료 시간보다 이전이어야 합니다.");
+    }
+
+    @ParameterizedTest(name = "{0}일 때 생성할 수 없다.")
+    @ValueSource(ints = {0, -1})
+    void 예약_참석_인원은_양수여야_한다(int attendeeCount) {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusSeconds(1L);
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, startTime, endTime, attendeeCount))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("참가 인원은 양수여야 합니다.");
     }
 
     @Test
@@ -78,8 +93,8 @@ class ReservationTest {
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
 
-        Reservation first = Reservation.create(meetingRoomId, organizer, startTime, endTime);
-        Reservation second = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation first = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation second = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // when
         boolean actual = first.overlapTime(second);
@@ -95,7 +110,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // when
         Reservation actual = reservation.withAssignedId(1L);
@@ -112,7 +127,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // when & then
         assertThatThrownBy(() -> reservation.withAssignedId(id))
@@ -127,7 +142,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
 
         // when
         boolean actual = reservation.matchPassword("1234");
@@ -143,7 +158,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
                                              .withAssignedId(1L);
 
         // when
@@ -160,7 +175,7 @@ class ReservationTest {
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime startTime = LocalDateTime.now();
         LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime)
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
                                              .withAssignedId(1L);
 
         // when
