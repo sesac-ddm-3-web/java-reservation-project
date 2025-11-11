@@ -20,12 +20,18 @@ public class Reservation {
     @JsonFormat(pattern = "HH:mm")
     LocalTime end;
 
+    // findByRoomId
+    public Integer getRoomId() {
+        return roomId;
+    }
+
+    // findById
+    public Integer getId() {
+        return id;
+    }
+
     // 예약 번호 자동 증가를 위해
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getRoomId() {
-        return roomId;
     }
 }

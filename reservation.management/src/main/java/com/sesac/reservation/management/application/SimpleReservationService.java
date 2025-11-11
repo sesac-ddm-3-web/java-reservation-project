@@ -49,4 +49,8 @@ public class SimpleReservationService {
 
         return reservationDtos;
     }
+
+    public void delete(Integer id) {
+        listReservationRepository.delete(id);
+    }
 }

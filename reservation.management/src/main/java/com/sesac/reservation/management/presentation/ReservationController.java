@@ -2,7 +2,6 @@ package com.sesac.reservation.management.presentation;
 
 import com.sesac.reservation.management.application.SimpleReservationService;
 import com.sesac.reservation.management.application.SimpleRoomService;
-import com.sesac.reservation.management.domain.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +35,16 @@ public class ReservationController {
     public List<ReservationDto> findReservationsByRoomId(
             @RequestParam(required = false) Integer roomId
     ) {
-        if(roomId == null) {
+        if (roomId == null) {
             return simpleReservationService.findAll();
         }
 
         return simpleReservationService.findByRoomId(roomId);
+    }
+
+    // [API] 특정 예약을 취소(삭제)하는 API를 구현해야 합니다.
+    @RequestMapping(value = "/reservations", method = RequestMethod.DELETE)
+    public void deleteReservations(@RequestBody ReservationDto reservationDto) {
+        simpleReservationService.delete(reservationDto.getId());
     }
 }

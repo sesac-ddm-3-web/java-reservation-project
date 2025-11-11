@@ -29,4 +29,17 @@ public class ListReservationRepository {
     public List<Reservation> findAll() {
         return reservations;
     }
+
+    public Reservation findById(Integer id) {
+        return reservations.stream()
+                .filter(r -> r.getId().equals(id))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public void delete(Integer id) {
+        Reservation reservation = this.findById(id);
+
+        reservations.remove(reservation);
+    }
 }
