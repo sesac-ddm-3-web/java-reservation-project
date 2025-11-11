@@ -2,6 +2,7 @@ package com.meeting.reservation.application;
 
 import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.ReservationFactory;
+import com.meeting.reservation.domain.reservation.ReservationFrequency;
 import com.meeting.reservation.domain.reservation.Reservations;
 import com.meeting.reservation.domain.reservation.repository.ReservationRepository;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
@@ -44,6 +45,31 @@ public class ReservationService {
 
         return reservationRepository.save(reservation)
                                     .getId();
+    }
+
+    public void repeatReserve(
+            Long meetingRoomId,
+            Organizer organizer,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            int attendeeCount,
+            String frequencyName,
+            int repeatCount
+    ) {
+        MeetingRooms meetingRooms = meetingRoomRepository.findAll();
+        TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
+        ReservationFrequency reservationFrequency = ReservationFrequency.find(frequencyName);
+        List<Reservation> reservations = reservationFactory.create(
+                meetingRooms,
+                meetingRoomId,
+                organizer,
+                timeSlot,
+                attendeeCount,
+                reservationFrequency,
+                repeatCount
+        );
+
+        reservationRepository.saveAll(reservations);
     }
 
     public List<Reservation> findReservations(Long meetingRoomId) {
