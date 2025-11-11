@@ -47,13 +47,13 @@ public class InMemoryReservationRepository implements ReservationRepository {
         List<Reservation> reservationList = reservations.get(meetingRoomId);
 
         if (reservationList == null) {
-            throw new MeetingRoomNotFoundException();
+            throw new MeetingRoomReservationsNotFoundException();
         }
 
         Reservation target = reservationList.stream()
                                             .filter(reservation -> reservation.isEqualId(id))
                                             .findAny()
-                                            .orElseThrow(NoReservationsForRoomException::new);
+                                            .orElseThrow(NoReservationsForMeetingRoomException::new);
 
         reservationList.remove(target);
     }
@@ -63,13 +63,13 @@ public class InMemoryReservationRepository implements ReservationRepository {
         List<Reservation> reservationList = reservations.get(meetingRoomId);
 
         if (reservationList == null) {
-            throw new MeetingRoomNotFoundException();
+            throw new MeetingRoomReservationsNotFoundException();
         }
 
         return reservationList.stream()
                               .filter(reservation -> reservation.isEqualId(id))
                               .findAny()
-                              .orElseThrow(NoReservationsForRoomException::new);
+                              .orElseThrow(NoReservationsForMeetingRoomException::new);
     }
 
     @Override
@@ -82,16 +82,16 @@ public class InMemoryReservationRepository implements ReservationRepository {
         );
     }
 
-    public static class MeetingRoomNotFoundException extends IllegalArgumentException {
+    public static class MeetingRoomReservationsNotFoundException extends IllegalArgumentException {
 
-        public MeetingRoomNotFoundException() {
+        public MeetingRoomReservationsNotFoundException() {
             super("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
         }
     }
 
-    public static class NoReservationsForRoomException extends IllegalArgumentException {
+    public static class NoReservationsForMeetingRoomException extends IllegalArgumentException {
 
-        public NoReservationsForRoomException() {
+        public NoReservationsForMeetingRoomException() {
             super("지정한 ID에 대한 예약을 찾지 못했습니다.");
         }
     }

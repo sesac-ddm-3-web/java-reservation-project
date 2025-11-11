@@ -12,8 +12,8 @@ import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomLocation;
-import com.meeting.reservation.persistence.InMemoryReservationRepository.MeetingRoomNotFoundException;
-import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForRoomException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.MeetingRoomReservationsNotFoundException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForMeetingRoomException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -137,7 +137,7 @@ class InMemoryReservationRepositoryTest {
     void 존재하지_않는_회의실의_예약은_삭제할_수_없다() {
         // given & when & then
         assertThatThrownBy(() -> reservationRepository.delete(MeetingRoomId.create(999L), 1L))
-                .isInstanceOf(MeetingRoomNotFoundException.class)
+                .isInstanceOf(MeetingRoomReservationsNotFoundException.class)
                 .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
 
@@ -152,7 +152,7 @@ class InMemoryReservationRepositoryTest {
 
         // when & then
         assertThatThrownBy(() -> reservationRepository.delete(MeetingRoomId.create(1L), -999L))
-                .isInstanceOf(NoReservationsForRoomException.class)
+                .isInstanceOf(NoReservationsForMeetingRoomException.class)
                 .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
     }
 
@@ -241,7 +241,7 @@ class InMemoryReservationRepositoryTest {
     void 존재하지_않는_회의실의_예약은_조회할_수_없다() {
         // given & when & then
         assertThatThrownBy(() -> reservationRepository.find(MeetingRoomId.create(999L), 1L))
-                .isInstanceOf(MeetingRoomNotFoundException.class)
+                .isInstanceOf(MeetingRoomReservationsNotFoundException.class)
                 .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
 
@@ -249,7 +249,7 @@ class InMemoryReservationRepositoryTest {
     void 존재하지_않는_예약_ID로는_예약을_조회할_수_없다() {
         // when & then
         assertThatThrownBy(() -> reservationRepository.find(MeetingRoomId.create(1L), -999L))
-                .isInstanceOf(MeetingRoomNotFoundException.class)
+                .isInstanceOf(MeetingRoomReservationsNotFoundException.class)
                 .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
 

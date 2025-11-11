@@ -1,9 +1,11 @@
 package com.meeting.reservation.global;
 
-import com.meeting.reservation.domain.reservation.Reservations;
+import com.meeting.reservation.domain.equipment.Equipments.EquipmentNotFoundException;
 import com.meeting.reservation.domain.reservation.Reservations.InvalidReservationPasswordException;
+import com.meeting.reservation.domain.reservation.Reservations.ReservationNotFoundException;
 import com.meeting.reservation.domain.room.MeetingRooms.MeetingRoomNotFoundException;
-import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForRoomException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.MeetingRoomReservationsNotFoundException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForMeetingRoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,14 +20,22 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        log.warn("Exception : ", ex);
+
+        return ResponseEntity.internalServerError()
+                             .build();
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest()
                              .body(ex.getMessage());
     }
 
-    @ExceptionHandler(Reservations.ReservationNotFoundException.class)
-    public ResponseEntity<String> handleReservationNotFoundException(Reservations.ReservationNotFoundException ex) {
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<String> handleReservationNotFoundException(ReservationNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(ex.getMessage());
     }
@@ -36,9 +46,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                              .body(ex.getMessage());
     }
 
-    @ExceptionHandler(NoReservationsForRoomException.class)
-    public ResponseEntity<String> handleReservationNotFoundInRepositoryException(
-            NoReservationsForRoomException ex
+    @ExceptionHandler(NoReservationsForMeetingRoomException.class)
+    public ResponseEntity<String> handleNoReservationsForRoomException(
+            NoReservationsForMeetingRoomException ex
     ) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(ex.getMessage());
@@ -47,6 +57,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidReservationPasswordException.class)
     public ResponseEntity<String> handlerInvalidReservationPasswordException(InvalidReservationPasswordException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EquipmentNotFoundException.class)
+    public ResponseEntity<String> handleEquipmentNotFoundException(EquipmentNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MeetingRoomReservationsNotFoundException.class)
+    public ResponseEntity<String> handleMeetingRoomReservationsNotFoundException(
+            MeetingRoomReservationsNotFoundException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(ex.getMessage());
     }
 
