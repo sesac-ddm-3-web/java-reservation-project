@@ -49,7 +49,7 @@ public class Reservation {
         }
     }
 
-    private Reservation(
+    Reservation(
             ReservationId id,
             MeetingRoomId meetingRoomId,
             TimeSlot timeSlot,
