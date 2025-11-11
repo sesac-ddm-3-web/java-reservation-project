@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "id": 1, "name": "회의실 A", "capacity": 2 },
+    { "id": 2, "name": "회의실 B", "capacity": 2 },
+    { "id": 3, "name": "회의실 C", "capacity": 3 },
+    { "id": 4, "name": "회의실 D", "capacity": 4 },
+    { "id": 5, "name": "회의실 E", "capacity": 8 }
+  ]
+}
