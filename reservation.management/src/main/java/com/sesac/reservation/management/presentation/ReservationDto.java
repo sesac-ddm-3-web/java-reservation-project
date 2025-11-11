@@ -5,50 +5,85 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalTime;
 
 public class ReservationDto {
-    Integer id; // 예약 번호 (auto increment FROM database)
-    Integer roomId; // 예약한 방 번호
-    String name; // 예약자명
-    String phoneNumber; // 전화번호
-    String password; // 비밀번호
-    Integer attendeeCount; // 참석 인원
+    private Integer id; // 예약 번호 (auto increment FROM database)
+    private Integer roomId; // 예약한 방 번호
+    private String name; // 예약자명
+    private String phoneNumber; // 전화번호
+    private String password; // 비밀번호
+    private Integer attendeeCount; // 참석 인원
 
     // 시작 시각
     @JsonFormat(pattern = "HH:mm")
-    LocalTime start;
+    private LocalTime start;
 
     // 종료 시각
     @JsonFormat(pattern = "HH:mm")
-    LocalTime end;
+    private LocalTime end;
+
+    public ReservationDto() {
+    }
 
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
     }
 
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Integer getAttendeeCount() {
         return attendeeCount;
+    }
+
+    public void setAttendeeCount(Integer attendeeCount) {
+        this.attendeeCount = attendeeCount;
     }
 
     public LocalTime getStart() {
         return start;
     }
 
+    public void setStart(LocalTime start) {
+        this.start = start;
+    }
+
     public LocalTime getEnd() {
         return end;
     }
 
-    public Integer getRoomId() {
-        return roomId;
+    public void setEnd(LocalTime end) {
+        this.end = end;
     }
 }

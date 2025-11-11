@@ -1,7 +1,9 @@
 package com.sesac.reservation.management.infrastructure;
 
 import com.sesac.reservation.management.domain.Reservation;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,7 +36,10 @@ public class ListReservationRepository {
         return reservations.stream()
                 .filter(r -> r.getId().equals(id))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다."));
+
+        // 예외 처리 : 등등
     }
 
     public void delete(Integer id) {

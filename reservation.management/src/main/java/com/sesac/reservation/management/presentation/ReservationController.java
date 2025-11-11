@@ -45,6 +45,6 @@ public class ReservationController {
     // [API] 특정 예약을 취소(삭제)하는 API를 구현해야 합니다.
     @RequestMapping(value = "/reservations", method = RequestMethod.DELETE)
     public void deleteReservations(@RequestBody ReservationDto reservationDto) {
-        simpleReservationService.delete(reservationDto.getId());
+        simpleReservationService.delete(reservationDto.getId(), reservationDto.getPassword());
     }
 }
