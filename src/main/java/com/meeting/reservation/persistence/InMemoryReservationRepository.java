@@ -4,6 +4,7 @@ import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.Reservations;
 import com.meeting.reservation.domain.reservation.repository.ReservationRepository;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +21,25 @@ public class InMemoryReservationRepository implements ReservationRepository {
     private final Map<MeetingRoomId, List<Reservation>> reservations = new ConcurrentHashMap<>();
 
     @Override
-    public Reservation save(Reservation reservation) {
+    public Reservation save(Reservation target) {
         Long reservationId = idGenerator.getAndAdd(1L);
-        Reservation savedReservation = reservation.withAssignedId(reservationId);
+        Reservation savedReservation = target.withAssignedId(reservationId);
 
-        reservations.computeIfAbsent(reservation.getMeetingRoomId(), key -> new CopyOnWriteArrayList<>())
+        reservations.computeIfAbsent(target.getMeetingRoomId(), key -> new CopyOnWriteArrayList<>())
                     .add(savedReservation);
 
         return savedReservation;
+    }
+
+    @Override
+    public List<Reservation> saveAll(List<Reservation> target) {
+        List<Reservation> reservationList = new ArrayList<>();
+
+        for (Reservation reservation : target) {
+            reservationList.add(this.save(reservation));
+        }
+
+        return reservationList;
     }
 
     @Override
