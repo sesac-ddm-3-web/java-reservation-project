@@ -170,4 +170,90 @@ class ReservationsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 비밀번호가 일치하지 않습니다.");
     }
+
+    @Test
+    void 반복_예약이_모두_유효한지_검증한다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusHours(1L);
+        Reservation existingReservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                                     .withAssignedId(1L);
+
+        Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
+        LocalDateTime targetStartTime1 = LocalDateTime.now().plusDays(1L);
+        LocalDateTime targetEndTime1 = targetStartTime1.plusHours(1L);
+        LocalDateTime targetStartTime2 = LocalDateTime.now().plusDays(2L);
+        LocalDateTime targetEndTime2 = targetStartTime2.plusHours(1L);
+
+        Reservation targetReservation1 = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime1, targetEndTime1, 5)
+                                                    .withAssignedId(2L);
+        Reservation targetReservation2 = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime2, targetEndTime2, 5)
+                                                    .withAssignedId(3L);
+
+        Reservations reservations = Reservations.create(meetingRoomId, List.of(existingReservation));
+        List<Reservation> targetReservations = List.of(targetReservation1, targetReservation2);
+
+        // when & then
+        assertDoesNotThrow(() -> reservations.validateRepeatReserve(targetReservations));
+    }
+
+    @Test
+    void 반복_예약_중_하나가_기존_예약과_동등하면_예외가_발생한다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusHours(1L);
+        Reservation existingReservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                                     .withAssignedId(1L);
+
+        Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
+        LocalDateTime targetStartTime1 = LocalDateTime.now().plusDays(1L);
+        LocalDateTime targetEndTime1 = targetStartTime1.plusHours(1L);
+
+        Reservation targetReservation1 = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime1, targetEndTime1, 5)
+                                                    .withAssignedId(2L);
+        Reservation targetReservation2 = Reservation.create(meetingRoomId, targetOrganizer, startTime, endTime, 5)
+                                                    .withAssignedId(1L);
+
+        Reservations reservations = Reservations.create(meetingRoomId, List.of(existingReservation));
+        List<Reservation> targetReservations = List.of(targetReservation1, targetReservation2);
+
+        // when & then
+        assertThatThrownBy(() -> reservations.validateRepeatReserve(targetReservations))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 존재하는 예약입니다.");
+    }
+
+    @Test
+    void 반복_예약_중_하나가_기존_예약과_시간이_겹치면_예외가_발생한다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자1", "010-5678-1234", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusHours(2L);
+        Reservation existingReservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                                     .withAssignedId(1L);
+
+        Organizer targetOrganizer = Organizer.create("예약자2", "010-1234-5678", "4321");
+        LocalDateTime targetStartTime1 = LocalDateTime.now().plusDays(1L);
+        LocalDateTime targetEndTime1 = targetStartTime1.plusHours(1L);
+        LocalDateTime targetStartTime2 = startTime.plusMinutes(30L);
+        LocalDateTime targetEndTime2 = targetStartTime2.plusHours(1L);
+
+        Reservation targetReservation1 = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime1, targetEndTime1, 5)
+                                                    .withAssignedId(2L);
+        Reservation targetReservation2 = Reservation.create(meetingRoomId, targetOrganizer, targetStartTime2, targetEndTime2, 5)
+                                                    .withAssignedId(3L);
+
+        Reservations reservations = Reservations.create(meetingRoomId, List.of(existingReservation));
+        List<Reservation> targetReservations = List.of(targetReservation1, targetReservation2);
+
+        // when & then
+        assertThatThrownBy(() -> reservations.validateRepeatReserve(targetReservations))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이미 시간이 겹치는 예약이 존재합니다.");
+    }
 }

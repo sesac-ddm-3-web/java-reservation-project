@@ -30,6 +30,10 @@ public class Reservations {
         }
     }
 
+    public void validateRepeatReserve(List<Reservation> target) {
+        target.forEach(this::validateReserve);
+    }
+
     public void validateCancel(Long id, String password, LocalDateTime now) {
         Reservation target = values.stream()
                                    .filter(reservation -> reservation.isEqualId(id))
