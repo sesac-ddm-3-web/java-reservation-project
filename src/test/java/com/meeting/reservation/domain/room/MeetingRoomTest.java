@@ -111,4 +111,16 @@ class MeetingRoomTest {
         // then
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void 회의실에_참여_인원을_모두_수용할_수_있는지_검증한다() {
+        // given
+        MeetingRoomLocation location = MeetingRoomLocation.create(1, 1);
+        MeetingRoom meetingRoom = MeetingRoom.create("학습실1", 5, location);
+
+        // when & then
+        assertThatThrownBy(() -> meetingRoom.validateAttendeeCount(10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 회의실은 참가 인원을 전부 수용할 수 없습니다.");
+    }
 }

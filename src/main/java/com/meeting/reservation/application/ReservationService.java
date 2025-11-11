@@ -30,10 +30,10 @@ public class ReservationService {
             int attendeeCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
-
-        meetingRooms.validateCapacity(meetingRoomId, attendeeCount);
-
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
+
+        meetingRoom.validateAttendeeCount(attendeeCount);
+
         Reservations reservations = reservationRepository.findAll(meetingRoom.getId());
         Reservation reservation = Reservation.create(meetingRoom.getId(), organizer, startTime, endTime, attendeeCount);
 
