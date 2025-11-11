@@ -2,6 +2,7 @@ package com.meeting.reservation.domain.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
@@ -183,5 +184,107 @@ class ReservationTest {
 
         // then
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void 일_단위로_예약을_이동시킨다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                             .withAssignedId(1L);
+
+        // when
+        Reservation actual = reservation.shift(ReservationFrequency.DAILY, 3L);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 12, 0))
+        );
+    }
+
+    @Test
+    void 주_단위로_예약을_이동시킨다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                             .withAssignedId(1L);
+
+        // when
+        Reservation actual = reservation.shift(ReservationFrequency.WEEKLY, 2L);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 12, 0))
+        );
+    }
+
+    @Test
+    void 월_단위로_예약을_이동시킨다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.of(2025, 1, 15, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 1, 15, 12, 0);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                             .withAssignedId(1L);
+
+        // when
+        Reservation actual = reservation.shift(ReservationFrequency.MONTHLY, 3L);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 12, 0))
+        );
+    }
+
+    @Test
+    void 년_단위로_예약을_이동시킨다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                             .withAssignedId(1L);
+
+        // when
+        Reservation actual = reservation.shift(ReservationFrequency.YEARLY, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2026, 11, 11, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2026, 11, 11, 12, 0))
+        );
+    }
+
+    @Test
+    void 예약_이동_후_다른_속성들은_유지된다() {
+        // given
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
+                                             .withAssignedId(1L);
+
+        // when
+        Reservation actual = reservation.shift(ReservationFrequency.DAILY, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getId().getValue()).isEqualTo(1L),
+                () -> assertThat(actual.getMeetingRoomId().getValue()).isEqualTo(1L),
+                () -> assertThat(actual.getAttendeeCount()).isEqualTo(5),
+                () -> assertThat(actual.getOrganizer()).isEqualTo(organizer)
+        );
     }
 }

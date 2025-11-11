@@ -75,6 +75,18 @@ public class Reservation {
         );
     }
 
+    public Reservation shift(ReservationFrequency frequency, long amount) {
+        TimeSlot shiftTimeSlot = this.timeSlot.shiftBy(frequency, amount);
+
+        return new Reservation(
+                this.id,
+                this.meetingRoomId,
+                shiftTimeSlot,
+                this.attendeeCount,
+                this.organizer
+        );
+    }
+
     public boolean overlapTime(Reservation other) {
         return timeSlot.overlapTime(other.timeSlot);
     }
