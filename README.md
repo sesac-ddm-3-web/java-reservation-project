@@ -1,68 +1,5 @@
-# 0. 실습 환경 및 제출 방법
+# 1. 핵심 요구사항
 
-## 실습 환경
-
-Build tool: Gradle or Maven (선택한 이유 필요)
-
-Language: Java17 or Java 21 or Java 25 (선택한 이유 필요)
-
-Spring Boot: 3.5.7
-
-인메모리 컬렉션 사용
-
-## 제출 방법
-
-- 본인 github main(or master) branch로 부터 새로운 branch 생성
-- 작업 후 pull request 생성
-    - merge, rebase, squash 찾아보기
-- 리뷰어로 지정된 교육생 리뷰할 수 있도록 권한 부여
-- 11월 12일 23시 59분까지 페어 리뷰 (1 교육생당 2교육생 PR 리뷰)
-    - 완료되었으면 디스코드 쓰레드에 개별로 댓글 남겨주세요.
-
-## PR 리뷰 권장 사항
-
-- 해결하고자 하는 이슈나 요구사항을 제대로 구현했는지 확인
-- 구현된 핵심 비즈니스 로직이 올바른지, 엣지 케이스나 예외 상황을 충분히 고려했는지 검토
-- 테스트 코드가 있다면 적절하게 추가되었는지 확인
-- 코드 컨벤션 (변수, 메소드, 클래스 이름, 메소드 길이 등)이 명확하고 의미를 잘 전달하는지, 표준 명명 규칙을 따르는지 확인
-- 좋은 예시
-    - 변수명 `tempVal` 대신 `customerPendingCount`처럼 의도를 명확히 드러내는 이름으로 바꾸면 가독성이 좋아져요. (가이드: [팀의 명명 규칙 문서] 참고)
-    - 현재 `findById`를 반복문 내에서 호출하면 N+1 문제가 발생할 수 있어요. `fetch join`이나 `@BatchSize`를 활용하여 한 번의 쿼리로 데이터를 가져오도록 개선하면 성능이 향상됩니다. 이렇게 해볼까요?
-    - 비즈니스 로직은 주로 `Service` 계층에서 처리하도록 역할을 분리하는 것이 좋습니다. `Controller`는 요청/응답 처리만 담당하도록 해당 로직을 `UserService`로 옮기는 것을 고려해 주세요.
-    - 로그인 성공 로직이 깔끔하게 구현되었네요! 특히 [특정 코드] 부분은 좋은 설계입니다.
-- 나쁜 예시
-    - 이 변수명은 별로예요.
-    - 이건 N+1 문제 일으켜요. 수정하세요.
-    - 비즈니스 로직이 컨트롤러에 있어요.
-- 리뷰에 단순 퀴즈쇼는 지양할 것
-    - ex) 이렇게 한 이유가 뭐에요?, 이건 무슨 의미에요?
-
-## PR 리뷰 조
-
-- 찬용 - 지민, 동훈
-- 지민 - 희찬, 은서
-- 준하 - 찬용, 종균
-- 희찬 - 현수, 준영
-- 지우 - 준하, 찬미
-- 현수 - 찬미, 나현
-- 나현 - 지우, 현수
-- 찬미 - 종균, 지우
-- 준영 - 나현, 희찬
-- 종균 - 동훈, 준하
-- 은서 - 준영, 지민
-- 동훈 - 은서, 찬용
-
-# 1. 요구사항
-
-“회의실(또는 스터디룸)”과 “예약”이라는 두 가지 핵심 도메인을 자유롭게 설계해야 합니다.
-
-첫 요구사항에 있는 기본 기능을 구현하고 완성한 교육생은 2, 3, 4번까지 순서대로 진행하면 됩니다.
-
-시간은 17시 ~ 21시 30분까지 진행할 예정입니다.
-
-아래 요구사항과 별개로 README에 본인들이 작업할 프로젝트 요구사항들을 정리해서 적어보세요.
-
-README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝트 해보면 좋을 것 같습니다.
 
 ## 회의실 요구사항
 
@@ -98,6 +35,156 @@ README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝
     - 예약 시간이 겹치는 경우
     - 유효성 검사 실패한 경우
     - 등등
+
+---
+
+## 1. 요구사항 분석
+
+- 회의실 정보가 인메모리 컬렉션에 저장되어있다.
+  - 회의실 객체는 (회의실 번호, 회의실 이름) 정보를 관리한다.
+  
+
+- 예약은 비회원 예약제로 진행된다.
+  - 예약자명, 전화번호, 비밀번호, 시간을 예약 정보에 포함해야한다.
+  - 예약의 기본 단위는 임의로 30분으로 지정
+  - 하루를 표현하는 시간 범위 : 00:00 ~ 24:00 (총 48 slot)
+  - 예약 정보에 예약 시간을 관리하면?
+
+    → 필요할 때 데이터를 저장해서, 예약하지 않은 경우 데이터가 생성되지 않는다.
+  
+    → 가능한 예약 시간인지 검증하는 과정에 startAt, endAt 비교가 필수적이다.
+
+  - 미리 슬롯으로 만들면?
+
+    → 장점 : 시간 비교를 하지 않아도 된다.
+  
+    → 단점 : 쓰지않는 데이터를 미리 만들게 된다.
+
+
+- Daily 예약 슬롯 생성 후 해당 Slot 기반 예약 시스템 구현 결정
+  - 하루 회의실 기준 생성되는 데이터 48개
+  - 365일 기준 약 17만개
+  - 회의실 수 100개로 잡고 1년을 계산하면 대략 1700만개의 Slot
+  - 10년을 운영한다고 했을 때 데이터 1억개
+
+-> 충분히 감당 가능한 숫자이며, 무엇보다 충돌 검증을 수월하게 진행할 수 있다고 판단.
+  
+
+## 2. 객체 파악
+
+- 회의실 (회의실 번호, 회의실 이름)
+- 예약 슬롯 (시작 시간, 종료 시간, 오픈 시간, 예약 여부, 회의실)
+- 예약 (예약자 명, 비밀번호, 예약 슬롯)
+
+## 3. 도메인 모델
+
+...ing
+
+
+## 4. API 문서
+
+### 회의실 목록 조회
+
+**GET /meeting-rooms**
+
+응답 본문: MeetingRoomResDto[]
+```json
+  - id: 회의실 식별자(Long)
+  - name: 회의실 이름(String)
+```
+
+### 예약 슬롯 목록 조회
+
+**GET /reservation-slots**
+
+응답 본문: ReservationSlotResDto[]
+```json
+id: 슬롯 식별자(Long)
+startAt / endAt: 슬롯 시작·종료 시각(ISO-8601 LocalDateTime)
+openedAt: 슬롯이 공개된 시각(ISO-8601 LocalDateTime)
+isReserved: 예약 여부(boolean)
+meetingRoomId: 연결된 회의실 ID(Long)
+```
+
+슬롯 예약 상태 검증 로직: 이미 예약되었거나 공개 시간이 현재 이후인 경우 예약할 수 없으며 409 CONFLICT와 코드 RESERVATION_SLOT_NOT_AVAILABLE가 반환됩니다.
+
+### 예약 생성
+**POST /reservations**
+
+요청 본문: ReservationCreateDto
+```json
+reserverName (String, 필수)
+password (String, 필수)
+selectedReservationSlotIds (Long[], 1개 이상, 각 원소 필수)
+```
+
+성공 시 본문 없이 200 OK(스프링 기본) 응답.
+
+설명:
+- 요청한 슬롯 수와 실제 존재하는 슬롯 수가 다르면 400 BAD_REQUEST, 코드 RESERVATION_SLOT_COUNT_MISMATCH 반환.
+- 각 슬롯의 예약 가능 여부를 확인한 뒤 예약을 생성합니다.
+
+예외:
+- 선택한 슬롯 중 예약 불가 상태가 있으면 409 CONFLICT, 
+  코드 RESERVATION_SLOT_NOT_AVAILABLE 반환(상세는 “예약 슬롯 목록 조회” 참고).
+
+예시 요청
+```json
+{
+  "reserverName": "홍길동",
+  "password": "secret123",
+  "selectedReservationSlotIds": [101, 102]
+}
+```
+
+### 예약 목록 조회
+**GET /reservations**
+
+응답 본문: ReservationResDto[]
+
+```json
+reservationId (Long)
+reservationName (String)
+timeSlot: TImeSlotDto
+slotId, startAt, endAt
+meetingRoom: MeetingRoomResDto 구조 동일 (위 참고).
+```
+
+서비스는 ModelMapper를 이용해 예약과 슬롯, 회의실 정보를 DTO로 변환합니다.
+
+### 예약 삭제
+**DELETE /reservations**
+
+요청 본문: ReservationDeleteReqDto
+
+```json
+reservationIds (Long[], 1개 이상, 각 원소 필수)
+password (String, 필수)
+```
+
+성공 시 본문 없이 200 OK.
+
+처리 절차 및 오류:
+
+- 요청 ID 수와 실제 조회된 예약 수가 다르면 400 BAD_REQUEST, 
+  코드 RESERVATION_ID_COUNT_MISMATCH.
+
+- 비밀번호가 일치하지 않으면 401 UNAUTHORIZED, 
+  코드 INVALID_RESERVATION_PASSWORD.
+
+- 정상 처리 시 각 예약이 점유한 슬롯을 해제합니다.
+
+### 오류 코드 요약
+| HTTP 상태 | 코드                                | 발생 조건                                                              |
+| ------- | --------------------------------- | ------------------------------------------------------------------ |
+| 400     | `VALIDATION_FAILED`               | DTO 유효성 검증 실패 (필수 필드 누락 등)                    |
+| 400     | `RESERVATION_ID_COUNT_MISMATCH`   | 삭제 시 요청 ID와 실제 예약 수 불일치     |
+| 400     | `RESERVATION_SLOT_COUNT_MISMATCH` | 예약 생성 시 요청 슬롯 ID와 실제 슬롯 수 불일치 |
+| 401     | `INVALID_RESERVATION_PASSWORD`    | 예약 삭제 시 비밀번호 불일치           |
+| 404     | `NOT_FOUND`                       | 존재하지 않는 회의실 조회(서비스 계층)     |
+| 409     | `RESERVATION_SLOT_NOT_AVAILABLE`  | 슬롯이 이미 예약되었거나 아직 열리지 않은 경우  |
+
+---
 
 # 2. 추가 기능 구현
 
