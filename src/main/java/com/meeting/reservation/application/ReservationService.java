@@ -1,10 +1,12 @@
 package com.meeting.reservation.application;
 
 import com.meeting.reservation.domain.reservation.Reservation;
+import com.meeting.reservation.domain.reservation.ReservationFactory;
 import com.meeting.reservation.domain.reservation.Reservations;
 import com.meeting.reservation.domain.reservation.repository.ReservationRepository;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
+import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
 import com.meeting.reservation.domain.room.MeetingRooms;
 import com.meeting.reservation.domain.room.repository.MeetingRoomRepository;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class ReservationService {
 
     private final Clock clock;
+    private final ReservationFactory reservationFactory;
     private final MeetingRoomRepository meetingRoomRepository;
     private final ReservationRepository reservationRepository;
 
@@ -30,14 +33,14 @@ public class ReservationService {
             int attendeeCount
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
-        MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
-
-        meetingRoom.validateAttendeeCount(attendeeCount);
-
-        Reservations reservations = reservationRepository.findAll(meetingRoom.getId());
-        Reservation reservation = Reservation.create(meetingRoom.getId(), organizer, startTime, endTime, attendeeCount);
-
-        reservations.validateReserve(reservation);
+        TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
+        Reservation reservation = reservationFactory.create(
+                meetingRooms,
+                meetingRoomId,
+                organizer,
+                timeSlot,
+                attendeeCount
+        );
 
         return reservationRepository.save(reservation)
                                     .getId();

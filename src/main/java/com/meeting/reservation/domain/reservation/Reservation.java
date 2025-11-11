@@ -18,37 +18,6 @@ public class Reservation {
     private final int attendeeCount;
     private final Organizer organizer;
 
-    public static Reservation create(
-            MeetingRoomId meetingRoomId,
-            Organizer organizer,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
-            int attendeeCount
-    ) {
-        validateOrganizer(organizer);
-        validateAttendeeCount(attendeeCount);
-
-        return new Reservation(
-                ReservationId.EMPTY_RESERVATION_ID,
-                meetingRoomId,
-                TimeSlot.create(startTime, endTime),
-                attendeeCount,
-                organizer
-        );
-    }
-
-    private static void validateOrganizer(Organizer organizer) {
-        if (organizer == null) {
-            throw new IllegalArgumentException("예약자 정보는 비어 있을 수 없습니다.");
-        }
-    }
-
-    private static void validateAttendeeCount(int attendeeCount) {
-        if (attendeeCount <= 0) {
-            throw new IllegalArgumentException("참가 인원은 양수여야 합니다.");
-        }
-    }
-
     Reservation(
             ReservationId id,
             MeetingRoomId meetingRoomId,
@@ -79,7 +48,7 @@ public class Reservation {
         TimeSlot shiftTimeSlot = this.timeSlot.shiftBy(frequency);
 
         return new Reservation(
-                this.id,
+                ReservationId.EMPTY_RESERVATION_ID,
                 this.meetingRoomId,
                 shiftTimeSlot,
                 this.attendeeCount,

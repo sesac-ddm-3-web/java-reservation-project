@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.meeting.reservation.domain.reservation.vo.Organizer;
+import com.meeting.reservation.domain.reservation.vo.ReservationId;
+import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -22,37 +24,25 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
 
         // when
-        Reservation actual = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation actual = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
 
         // then
         assertThat(actual).isInstanceOf(Reservation.class);
     }
 
     @Test
-    void 예약자_정보가_있어야_한다() {
-        // given
-        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-
-        // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, null, startTime, endTime, 5))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("예약자 정보는 비어 있을 수 없습니다.");
-    }
-
-    @Test
     void 예약_시간_정보가_있어야_한다() {
-        // given
-        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
-        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-
         // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, null, null, 5))
+        assertThatThrownBy(() -> TimeSlot.create(null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 시간 정보는 비어 있을 수 없습니다.");
     }
@@ -60,30 +50,13 @@ class ReservationTest {
     @Test
     void 예약_시작_시간은_예약_종료_시간보다_앞서야_한다() {
         // given
-        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
-        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime startTime = endTime.plusSeconds(1L);
 
         // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, startTime, endTime, 5))
+        assertThatThrownBy(() -> TimeSlot.create(startTime, endTime))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 시작 시간은 예약 종료 시간보다 이전이어야 합니다.");
-    }
-
-    @ParameterizedTest(name = "{0}일 때 생성할 수 없다.")
-    @ValueSource(ints = {0, -1})
-    void 예약_참석_인원은_양수여야_한다(int attendeeCount) {
-        // given
-        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
-        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-
-        // when & then
-        assertThatThrownBy(() -> Reservation.create(meetingRoomId, organizer, startTime, endTime, attendeeCount))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("참가 인원은 양수여야 합니다.");
     }
 
     @Test
@@ -91,11 +64,22 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
 
-        Reservation first = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
-        Reservation second = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation first = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
+        Reservation second = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
 
         // when
         boolean actual = first.overlapTime(second);
@@ -109,9 +93,14 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
 
         // when
         Reservation actual = reservation.withAssignedId(1L);
@@ -126,9 +115,14 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
 
         // when & then
         assertThatThrownBy(() -> reservation.withAssignedId(id))
@@ -141,9 +135,14 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        );
 
         // when
         boolean actual = reservation.matchPassword("1234");
@@ -157,10 +156,14 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         boolean actual = reservation.isEqualId(1L);
@@ -174,10 +177,14 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.now();
-        LocalDateTime endTime = startTime.plusSeconds(1L);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusSeconds(1L));
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         boolean actual = reservation.afterStartTime(LocalDateTime.now().plusDays(1L));
@@ -191,10 +198,17 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(
+                LocalDateTime.of(2025, 11, 11, 10, 0),
+                LocalDateTime.of(2025, 11, 11, 12, 0)
+        );
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         Reservation actual = reservation.shift(ReservationFrequency.DAILY);
@@ -211,10 +225,17 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(
+                LocalDateTime.of(2025, 11, 11, 10, 0),
+                LocalDateTime.of(2025, 11, 11, 12, 0)
+        );
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         Reservation actual = reservation.shift(ReservationFrequency.WEEKLY);
@@ -231,10 +252,17 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.of(2025, 1, 15, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 1, 15, 12, 0);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(
+                LocalDateTime.of(2025, 1, 15, 10, 0),
+                LocalDateTime.of(2025, 1, 15, 12, 0)
+        );
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         Reservation actual = reservation.shift(ReservationFrequency.MONTHLY);
@@ -251,10 +279,17 @@ class ReservationTest {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(
+                LocalDateTime.of(2025, 11, 11, 10, 0),
+                LocalDateTime.of(2025, 11, 11, 12, 0)
+        );
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         Reservation actual = reservation.shift(ReservationFrequency.YEARLY);
@@ -267,21 +302,28 @@ class ReservationTest {
     }
 
     @Test
-    void 예약_이동_후_다른_속성들은_유지된다() {
+    void 예약_이동_후_ID를_제외한_다른_속성들은_유지된다() {
         // given
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
         Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
-        LocalDateTime startTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 11, 11, 12, 0);
-        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5)
-                                             .withAssignedId(1L);
+        TimeSlot timeSlot = TimeSlot.create(
+                LocalDateTime.of(2025, 11, 11, 10, 0),
+                LocalDateTime.of(2025, 11, 11, 12, 0)
+        );
+        Reservation reservation = new Reservation(
+                ReservationId.EMPTY_RESERVATION_ID,
+                meetingRoomId,
+                timeSlot,
+                5,
+                organizer
+        ).withAssignedId(1L);
 
         // when
         Reservation actual = reservation.shift(ReservationFrequency.DAILY);
 
         // then
         assertAll(
-                () -> assertThat(actual.getId().getValue()).isEqualTo(1L),
+                () -> assertThat(actual.getId()).isSameAs(ReservationId.EMPTY_RESERVATION_ID),
                 () -> assertThat(actual.getMeetingRoomId().getValue()).isEqualTo(1L),
                 () -> assertThat(actual.getAttendeeCount()).isEqualTo(5),
                 () -> assertThat(actual.getOrganizer()).isEqualTo(organizer)
