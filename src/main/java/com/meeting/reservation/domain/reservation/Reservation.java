@@ -2,9 +2,9 @@ package com.meeting.reservation.domain.reservation;
 
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
+import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -14,8 +14,7 @@ public class Reservation {
 
     private final ReservationId id;
     private final MeetingRoomId meetingRoomId;
-    private final LocalDateTime startTime;
-    private final LocalDateTime endTime;
+    private final TimeSlot timeSlot;
     private final int attendeeCount;
     private final Organizer organizer;
 
@@ -27,14 +26,12 @@ public class Reservation {
             int attendeeCount
     ) {
         validateOrganizer(organizer);
-        validateTime(startTime, endTime);
         validateAttendeeCount(attendeeCount);
 
         return new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 meetingRoomId,
-                startTime,
-                endTime,
+                TimeSlot.create(startTime, endTime),
                 attendeeCount,
                 organizer
         );
@@ -43,18 +40,6 @@ public class Reservation {
     private static void validateOrganizer(Organizer organizer) {
         if (organizer == null) {
             throw new IllegalArgumentException("예약자 정보는 비어 있을 수 없습니다.");
-        }
-    }
-
-    private static void validateTime(LocalDateTime startTime, LocalDateTime endTime) {
-        if (startTime == null || endTime == null) {
-            throw new IllegalArgumentException("예약 시간 정보는 비어 있을 수 없습니다.");
-        }
-
-        long betweenSecond = ChronoUnit.SECONDS.between(startTime, endTime);
-
-        if (betweenSecond <= 0L) {
-            throw new IllegalArgumentException("예약 시작 시간은 예약 종료 시간보다 이전이어야 합니다.");
         }
     }
 
@@ -67,15 +52,13 @@ public class Reservation {
     private Reservation(
             ReservationId id,
             MeetingRoomId meetingRoomId,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
+            TimeSlot timeSlot,
             int attendeeCount,
             Organizer organizer
     ) {
         this.id = id;
         this.meetingRoomId = meetingRoomId;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.timeSlot = timeSlot;
         this.attendeeCount = attendeeCount;
         this.organizer = organizer;
     }
@@ -86,19 +69,18 @@ public class Reservation {
         return new Reservation(
                 reservationId,
                 this.meetingRoomId,
-                this.startTime,
-                this.endTime,
+                this.timeSlot,
                 this.attendeeCount,
                 this.organizer
         );
     }
 
     public boolean overlapTime(Reservation other) {
-        return this.startTime.isBefore(other.endTime) && this.endTime.isAfter(other.startTime);
+        return timeSlot.overlapTime(other.timeSlot);
     }
 
     public boolean afterStartTime(LocalDateTime now) {
-        return this.startTime.isBefore(now);
+        return timeSlot.afterStartTime(now);
     }
 
     public boolean matchPassword(String password) {

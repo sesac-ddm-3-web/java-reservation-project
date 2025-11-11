@@ -28,8 +28,8 @@ public record ReservationCollectionResponse(List<ReservationResponse> reservatio
 
             return new ReservationResponse(
                     reservation.getId().getValue(),
-                    reservation.getStartTime(),
-                    reservation.getEndTime(),
+                    reservation.getTimeSlot().getStartTime(),
+                    reservation.getTimeSlot().getEndTime(),
                     reservation.getAttendeeCount(),
                     organizerResponse
             );
