@@ -13,7 +13,7 @@ import com.meeting.reservation.domain.room.MeetingRoom;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomLocation;
 import com.meeting.reservation.persistence.InMemoryReservationRepository.MeetingRoomNotFoundException;
-import com.meeting.reservation.persistence.InMemoryReservationRepository.ReservationNotFoundException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForRoomException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -152,7 +152,7 @@ class InMemoryReservationRepositoryTest {
 
         // when & then
         assertThatThrownBy(() -> reservationRepository.delete(MeetingRoomId.create(1L), -999L))
-                .isInstanceOf(ReservationNotFoundException.class)
+                .isInstanceOf(NoReservationsForRoomException.class)
                 .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
     }
 

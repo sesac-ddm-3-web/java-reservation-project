@@ -3,13 +3,18 @@ package com.meeting.reservation.global;
 import com.meeting.reservation.domain.reservation.Reservations;
 import com.meeting.reservation.domain.reservation.Reservations.InvalidReservationPasswordException;
 import com.meeting.reservation.domain.room.MeetingRooms.MeetingRoomNotFoundException;
-import com.meeting.reservation.persistence.InMemoryReservationRepository.ReservationNotFoundException;
+import com.meeting.reservation.persistence.InMemoryReservationRepository.NoReservationsForRoomException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -31,9 +36,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                              .body(ex.getMessage());
     }
 
-    @ExceptionHandler(ReservationNotFoundException.class)
+    @ExceptionHandler(NoReservationsForRoomException.class)
     public ResponseEntity<String> handleReservationNotFoundInRepositoryException(
-            ReservationNotFoundException ex
+            NoReservationsForRoomException ex
     ) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(ex.getMessage());
@@ -43,5 +48,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handlerInvalidReservationPasswordException(InvalidReservationPasswordException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .body(ex.getMessage());
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+            Exception ex,
+            Object body,
+            HttpHeaders headers,
+            HttpStatusCode statusCode,
+            WebRequest request
+    ) {
+        log.info("ex : ", ex);
+
+        return super.handleExceptionInternal(ex, body, headers, statusCode, request);
     }
 }

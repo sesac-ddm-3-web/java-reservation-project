@@ -53,7 +53,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
         Reservation target = reservationList.stream()
                                             .filter(reservation -> reservation.isEqualId(id))
                                             .findAny()
-                                            .orElseThrow(ReservationNotFoundException::new);
+                                            .orElseThrow(NoReservationsForRoomException::new);
 
         reservationList.remove(target);
     }
@@ -69,7 +69,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
         return reservationList.stream()
                               .filter(reservation -> reservation.isEqualId(id))
                               .findAny()
-                              .orElseThrow(ReservationNotFoundException::new);
+                              .orElseThrow(NoReservationsForRoomException::new);
     }
 
     @Override
@@ -89,9 +89,9 @@ public class InMemoryReservationRepository implements ReservationRepository {
         }
     }
 
-    public static class ReservationNotFoundException extends IllegalArgumentException {
+    public static class NoReservationsForRoomException extends IllegalArgumentException {
 
-        public ReservationNotFoundException() {
+        public NoReservationsForRoomException() {
             super("지정한 ID에 대한 예약을 찾지 못했습니다.");
         }
     }
