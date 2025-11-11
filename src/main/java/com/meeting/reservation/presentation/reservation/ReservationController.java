@@ -5,6 +5,7 @@ import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.presentation.reservation.dto.request.CancelReservationRequest;
+import com.meeting.reservation.presentation.reservation.dto.request.RepeatReserveRequest;
 import com.meeting.reservation.presentation.reservation.dto.request.ReserveRequest;
 import com.meeting.reservation.presentation.reservation.dto.response.ReservationCollectionResponse;
 import com.meeting.reservation.presentation.reservation.dto.response.ReservationResponse;
@@ -43,7 +44,6 @@ public class ReservationController {
                 request.organizer().phoneNumber(),
                 request.organizer().password()
         );
-
         ReservationId reservationId = reservationService.reserve(
                 meetingRoomId,
                 organizer,
@@ -51,10 +51,36 @@ public class ReservationController {
                 request.endTime(),
                 request.attendeeCount()
         );
+        URI location = URI.create("/rooms/" + meetingRoomId + "/reservations" + reservationId.getValue());
 
-        return ResponseEntity.created(
-                                     URI.create("/rooms/" + meetingRoomId + "/reservations" + reservationId.getValue())
-                             )
+        return ResponseEntity.created(location)
+                             .build();
+    }
+
+    @PostMapping("/repeat")
+    public ResponseEntity<Void> repeatReserve(
+            @PathVariable Long meetingRoomId,
+            @Valid @RequestBody RepeatReserveRequest request
+    ) {
+        Organizer organizer = Organizer.create(
+                request.organizer().name(),
+                request.organizer().phoneNumber(),
+                request.organizer().password()
+        );
+
+        reservationService.repeatReserve(
+                meetingRoomId,
+                organizer,
+                request.startTime(),
+                request.endTime(),
+                request.attendeeCount(),
+                request.frequency(),
+                request.repeatCount()
+        );
+
+        URI location = URI.create("/rooms/" + meetingRoomId + "/reservations");
+
+        return ResponseEntity.created(location)
                              .build();
     }
 
