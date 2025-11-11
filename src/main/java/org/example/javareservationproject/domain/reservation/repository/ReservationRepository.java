@@ -3,11 +3,11 @@ package org.example.javareservationproject.domain.reservation.repository;
 import java.util.Optional;
 
 import org.example.javareservationproject.domain.reservation.Reservation;
-import org.example.javareservationproject.domain.reservation.Reservations;
+import org.example.javareservationproject.domain.reservation.RoomReservations;
 
 public interface ReservationRepository {
 
-    Reservations findByMeetingRoomId(Long meetingRoomId);
+    RoomReservations findByMeetingRoomId(Long meetingRoomId);
 
     Optional<Reservation> findByIdAndMeetingRoomId(Long meetingRoomId, Long id);
 

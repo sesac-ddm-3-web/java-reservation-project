@@ -3,6 +3,8 @@ package org.example.javareservationproject.domain.reservation;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import org.example.javareservationproject.domain.reservation.exception.InvalidReservationException;
 
@@ -18,17 +20,24 @@ public class ReservationTime {
     private static final LocalTime AVAILABLE_END_TIME = LocalTime.of(23, 0, 0);
     private static final int MAX_MINUTES = 6 * 60; // 6시간
 
+    // 반복
+    private RepetitionType type;
+    private int repeatCnt;
+
+    // 시간
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
 
-    public ReservationTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public ReservationTime(LocalDate date, LocalTime startTime, LocalTime endTime, RepetitionType type, int repeatCnt) {
         validateOrder(startTime, endTime);
         validateRule(startTime, endTime);
 
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.type = type;
+        this.repeatCnt = repeatCnt;
     }
 
     public void validateOrder(LocalTime startTime, LocalTime endTime) {
@@ -53,10 +62,53 @@ public class ReservationTime {
         }
     }
 
-    public boolean isConflict(LocalDate date, LocalTime inputStartTime, LocalTime inputEndTime) {
-        if (!this.date.equals(date)) {
+    // 이 예약이 실제로 발생하는 날짜 리스트
+    private List<LocalDate> reservedDates() {
+        if (type == null) {
+            throw new InvalidReservationException("유효하지 않은 예약 반복 타입입니다.");
+        }
+        type.validate(repeatCnt);
+
+        return switch (type) {
+            case ONCE    -> List.of(date);
+            case WEEKLY  -> IntStream.range(0, repeatCnt)
+                .mapToObj(i -> date.plusWeeks(i))
+                .toList();
+            case MONTHLY -> IntStream.range(0, repeatCnt)
+                .mapToObj(i -> date.plusMonths(i))
+                .toList();
+        };
+    }
+
+    // 입력 받은 예약과 충돌하는지 판단
+    public boolean isConflict(ReservationTime other) {
+        if (!isTimeOverlap(other.startTime, other.endTime)) {
             return false;
         }
-        return inputStartTime.isBefore(this.endTime) && inputEndTime.isAfter(this.startTime);
+
+        List<LocalDate> myDates = this.reservedDates();
+        List<LocalDate> otherDates = other.reservedDates();
+
+        int i = 0, j = 0;
+        while (i < myDates.size() && j < otherDates.size()) {
+            LocalDate a = myDates.get(i);
+            LocalDate b = otherDates.get(j);
+
+            if (a.isEqual(b)) {
+                return true;
+            }
+
+            if (a.isBefore(b)) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        return false;
+    }
+
+    // 시간대 겹침 여부
+    private boolean isTimeOverlap(LocalTime otherStart, LocalTime otherEnd) {
+        return this.startTime.isBefore(otherEnd) && otherStart.isBefore(this.endTime);
     }
 }

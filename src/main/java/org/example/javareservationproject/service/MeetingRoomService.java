@@ -5,7 +5,7 @@ import java.util.List;
 import org.example.javareservationproject.domain.meetingroom.MeetingRoom;
 import org.example.javareservationproject.domain.meetingroom.exception.MeetingRoomNotFoundException;
 import org.example.javareservationproject.domain.meetingroom.repository.MeetingRoomRepository;
-import org.example.javareservationproject.domain.reservation.Reservations;
+import org.example.javareservationproject.domain.reservation.RoomReservations;
 import org.example.javareservationproject.domain.reservation.repository.ReservationRepository;
 import org.example.javareservationproject.presentation.dto.MeetingRoomDto;
 import org.example.javareservationproject.presentation.dto.MeetingRoomReservationsDto;
@@ -47,7 +47,7 @@ public class MeetingRoomService {
 
         return new MeetingRoomReservationsDto(
             MeetingRoomDto.toDto(room),
-            room.getReservations().getCopy()
+            room.getRoomReservations().getCopy()
                 .stream()
                 .map(ReservationDto::toDto)
                 .toList()
@@ -62,8 +62,8 @@ public class MeetingRoomService {
     public MeetingRoom getByIdWithReservations(long id) {
         MeetingRoom room = meetingRoomRepository.findById(id)
             .orElseThrow(MeetingRoomNotFoundException::new);
-        Reservations reservations = reservationRepository.findByMeetingRoomId(id);
+        RoomReservations roomReservations = reservationRepository.findByMeetingRoomId(id);
 
-        return MeetingRoom.consist(room, reservations);
+        return MeetingRoom.consist(room, roomReservations);
     }
 }

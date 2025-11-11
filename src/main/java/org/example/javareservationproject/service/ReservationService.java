@@ -31,7 +31,7 @@ public class ReservationService {
 
         Reservation reservation = Reservation.create(
             roomId,
-            new ReservationTime(request.date(), request.startTime(), request.endTime()),
+            new ReservationTime(request.date(), request.startTime(), request.endTime(), request.repetitionType(), request.repeatCnt()),
             new ReservationInfo(request.headcount(), request.client(), request.phoneNumber(), request.password()),
             LocalDateTime.now()
         );

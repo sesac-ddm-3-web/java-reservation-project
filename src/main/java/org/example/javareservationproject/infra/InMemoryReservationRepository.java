@@ -1,14 +1,16 @@
 package org.example.javareservationproject.infra;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.example.javareservationproject.domain.reservation.Reservation;
-import org.example.javareservationproject.domain.reservation.Reservations;
+import org.example.javareservationproject.domain.reservation.RoomReservations;
 import org.example.javareservationproject.domain.reservation.repository.ReservationRepository;
 import org.example.javareservationproject.infra.storage.SnapshotBinding;
 import org.example.javareservationproject.infra.storage.support.SnapshotRepositorySupport;
@@ -30,12 +32,12 @@ public class InMemoryReservationRepository implements ReservationRepository, Sna
     private final SnapshotStorage<Reservation> storage;
 
     @Override
-    public Reservations findByMeetingRoomId(Long meetingRoomId) {
+    public RoomReservations findByMeetingRoomId(Long meetingRoomId) {
         TreeSet<Reservation> reservations = DB.stream()
             .filter(r -> meetingRoomId.equals(r.getMeetingRoomId()))
             .collect(Collectors.toCollection(TreeSet::new));
 
-        return new Reservations(reservations);
+        return new RoomReservations(reservations);
     }
 
     @Override
