@@ -2,7 +2,7 @@ package com.sesac.reservation.management.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class Reservation {
     Integer id; // 예약 번호 (auto increment FROM database)
@@ -12,10 +12,15 @@ public class Reservation {
     Integer attendeeCount; // 참석 인원
 
     // 시작 시각
-    @JsonFormat(pattern = "HH:MM")
-    LocalDateTime start;
+    @JsonFormat(pattern = "HH:mm")
+    LocalTime start;
 
     // 종료 시각
-    @JsonFormat(pattern = "HH:MM")
-    LocalDateTime end;
+    @JsonFormat(pattern = "HH:mm")
+    LocalTime end;
+
+    // 예약 번호 자동 증가를 위해
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }
