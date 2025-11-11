@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 테스트: 스터디룸 예약 시스템</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #2196F3; /* Blue */
+            --danger-color: #F44336; /* Red */
+            --background-light: #f4f7f6;
+            --background-white: #ffffff;
+            --text-dark: #333;
+            --border-color: #e0e0e0;
+            --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: var(--background-white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* ------------------ 뷰 컨테이너 ------------------ */
+        #room-list-container {
+            /* 초기 뷰 */
+        }
+
+        #room-list-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .room-card {
+            background-color: var(--background-white);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .room-title {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .room-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* ------------------ 예약/현황 뷰 ------------------ */
+        #reservation-form-view, #status-view-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--background-white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        /* ------------------ 버튼 및 결과 ------------------ */
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-grow: 1;
+        }
+
+        .btn-reserve {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-status {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-back {
+            background-color: #9E9E9E;
+            color: white;
+            flex-grow: 0;
+            margin-right: 10px;
+            width: fit-content;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border: 1px solid #ffcc80;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>스마트 스터디룸 예약 시스템 </h1>
+        <p>현재 API 주소: <span id="baseUrlDisplay"></span></p>
+    </header>
+
+    <div id="room-list-container">
+        <h2>📚 스터디룸 목록 </h2>
+        <div id="room-list-view">
+            <p id="loading-message">스터디룸 목록을 불러오는 중...</p>
+        </div>
+    </div>
+
+    <div id="reservation-form-container" style="display: none;">
+        <button class="btn btn-back" onclick="showRoomList()">🏠 목록으로 돌아가기</button>
+        <div id="reservation-form-view">
+            <h2 id="form-title"></h2>
+
+            <form id="createReservationForm">
+                <input type="hidden" id="formRoomId">
+
+                <div class="form-group">
+                    <label for="userName">사용자 이름 (userName):</label>
+                    <input type="text" id="userName" placeholder="예: 홍길동" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">전화번호 (phoneNumber) - 예: 010-1234-5678:</label>
+                    <input type="text" id="phoneNumber" placeholder="010-XXXX-XXXX" required>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="startTime">시작 시간 (startTime):</label>
+                        <input type="datetime-local" id="startTime" value="2025-12-01T10:00" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="endTime">종료 시간 (endTime):</label>
+                        <input type="datetime-local" id="endTime" value="2025-12-01T11:00" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="participantCount">참여 인원 (participantCount) (1~50명):</label>
+                    <input type="number" id="participantCount" value="4" min="1" max="50" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">예약 비밀번호 (password) (4~8자):</label>
+                    <input type="password" id="password" required>
+                </div>
+
+                <button class="btn btn-submit" type="submit">➕ 예약 생성</button>
+            </form>
+            <div class="result-area" id="reservationResult"></div>
+        </div>
+    </div>
+
+    <div id="status-view-container" style="display: none;">
+        <button class="btn btn-back" onclick="showRoomList()">🏠 목록으로 돌아가기</button>
+        <h2>예약 현황 및 취소 (Room ID: <span id="statusRoomId"></span>)</h2>
+        <div class="result-area" id="statusResult"></div>
+
+        <form id="removeReservationForm">
+            <div class="form-group">
+                <label for="removeReservationId">취소할 예약 ID (Reservation ID):</label>
+                <input type="number" id="removeReservationId" placeholder="예약 조회 후 입력" required>
+            </div>
+            <div class="form-group">
+                <label for="removePassword">예약 비밀번호:</label>
+                <input type="password" id="removePassword" required>
+            </div>
+            <button class="btn btn-delete" type="submit">❌ 예약 취소</button>
+        </form>
+        <div class="result-area" id="removeResult"></div>
+    </div>
+
+</div>
+
+<script>
+    // *************************************************************************
+    // ⚠️ API BASE URL 설정 ⚠️
+    const API_BASE_URL = 'http://localhost:8080';
+    // 서버가 다른 포트나 도메인에서 실행되는 경우 이 주소를 변경해야 합니다.
+    // *************************************************************************
+
+    document.getElementById('baseUrlDisplay').textContent = API_BASE_URL;
+
+    // 뷰 전환 함수
+    function switchView(viewId) {
+        document.getElementById('room-list-container').style.display = 'none';
+        document.getElementById('reservation-form-container').style.display = 'none';
+        document.getElementById('status-view-container').style.display = 'none';
+
+        document.getElementById(viewId).style.display = 'block';
+    }
+
+    // 1. 랜딩 페이지: 스터디룸 전체 리스트 로드 (GET /meetingRoom)
+    async function loadRoomList() {
+        const listContainer = document.getElementById('room-list-view');
+        listContainer.innerHTML = document.getElementById('loading-message').outerHTML;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/rooms`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const rooms = await response.json();
+            renderRoomCards(rooms);
+
+        } catch (error) {
+            listContainer.innerHTML = `<p style="color:var(--danger-color);">⚠️ 목록 로드 실패: ${error.message}<br>서버가 ${API_BASE_URL}에서 실행 중인지 확인하고 CORS 설정을 확인하세요.</p>`;
+        }
+    }
+
+    function renderRoomCards(rooms) {
+        const listContainer = document.getElementById('room-list-view');
+        listContainer.innerHTML = '';
+
+        if (rooms.length === 0) {
+            listContainer.innerHTML = '<p>등록된 스터디룸이 없습니다.</p>';
+            return;
+        }
+
+        rooms.forEach(room => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.innerHTML = `
+                    <div>
+                        <h3 class="room-title">Room ${room.id}. ${room.name || '이름 없음'}</h3>
+                        <div class="room-info">
+                            <p><strong>수용 인원:</strong> ${room.maxCapacity || 'N/A'}명</p>
+                            <p><strong>최대 이용 가능 시간:</strong> ${room.maxReservationTime || 'N/A'}시간</p>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-reserve" onclick="showReservationForm(${room.id}, '${room.name || `Room ${room.id}`}')">예약하기</button>
+                        <button class="btn btn-status" onclick="showReservationStatus(${room.id})">예약 현황 보기</button>
+                    </div>
+                `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    // 뷰 전환 함수
+    function showRoomList() {
+        history.pushState(null, '', '/');
+        switchView('room-list-container');
+        loadRoomList();
+    }
+
+    function showReservationForm(roomId, roomName) {
+        history.pushState({ roomId: roomId }, `예약 폼`, `/reserve/${roomId}`);
+        document.getElementById('formRoomId').value = roomId;
+        document.getElementById('form-title').textContent = `✅ ${roomName} 예약 생성`;
+        document.getElementById('reservationResult').textContent = '';
+        document.getElementById('createReservationForm').reset();
+
+        // DTO의 형식에 맞는 기본값 재설정 (YYYY-MM-DDThh:mm)
+        document.getElementById('startTime').value = "2025-12-01T10:00";
+        document.getElementById('endTime').value = "2025-12-01T11:00";
+        document.getElementById('participantCount').value = "4";
+
+        switchView('reservation-form-container');
+    }
+
+    // 2. 예약 현황 보기 (GET /reservation/{roomId})
+    async function showReservationStatus(roomId) {
+        history.pushState({ roomId: roomId }, `예약 현황`, `/status/${roomId}`);
+        document.getElementById('statusRoomId').textContent = roomId;
+        const resultArea = document.getElementById('statusResult');
+        resultArea.textContent = '로딩 중...';
+        switchView('status-view-container');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/rooms/${roomId}/reservations`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const reservations = await response.json();
+            resultArea.textContent = `**Room ID ${roomId} 예약 목록:**\n${JSON.stringify(reservations, null, 2)}`;
+        } catch (error) {
+            resultArea.textContent = `🚨 예약 조회 실패: ${error.message}`;
+        }
+    }
+
+    // 3. 예약 생성 폼 제출 (POST /reservation/{roomId})
+    document.getElementById('createReservationForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const roomId = document.getElementById('formRoomId').value;
+        const resultArea = document.getElementById('reservationResult');
+        resultArea.textContent = '예약 생성 요청 중...';
+
+        // ✅ JS 수정: datetime-local 값에 초(:00)를 추가하여 LocalDateTime 형식(ISO 8601)을 맞춤
+        const startTimeValue = document.getElementById('startTime').value + ':00';
+        const endTimeValue = document.getElementById('endTime').value + ':00';
+
+        // DTO 필드에 맞게 데이터 객체 구성
+        const reservationDto = {
+            startTime: startTimeValue,
+            endTime: endTimeValue,
+            userName: document.getElementById('userName').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            password: document.getElementById('password').value,
+            participantCount: parseInt(document.getElementById('participantCount').value, 10)
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/rooms/${roomId}/reservations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reservationDto)
+            });
+
+            if (!response.ok) {
+                let errorDetail = '알 수 없는 오류가 발생했습니다.';
+
+                try {
+                    const errorData = await response.json();
+                    errorDetail = errorData.message || errorData.error || `HTTP ${response.status} 오류. (상세 메시지 없음)`;
+                } catch (e) {
+                    const errorText = await response.text();
+                    errorDetail = errorText.substring(0, 200);
+                }
+
+                throw new Error(`[${response.status} ${response.statusText}] 예약 실패: ${errorDetail}`);
+            }
+
+            const data = await response.json();
+            resultArea.textContent = `🎉 예약 성공!:\n${JSON.stringify(data, null, 2)}`;
+            document.getElementById('createReservationForm').reset();
+            document.getElementById('password').value = '';
+
+        } catch (error) {
+            resultArea.textContent = `🚨 예약 실패: ${error.message}`;
+        }
+    });
+
+    // 4. 예약 취소 폼 제출 (DELETE /reservation/{reservationId})
+    document.getElementById('removeReservationForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const reservationId = document.getElementById('removeReservationId').value;
+        const password = document.getElementById('removePassword').value;
+        const resultArea = document.getElementById('removeResult');
+        resultArea.textContent = '예약 취소 요청 중...';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/reservations/${reservationId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'text/plain' },
+                body: password
+            });
+
+            if (response.status === 200 || response.status === 204) {
+                resultArea.textContent = `✅ 예약 ID ${reservationId}이(가) 성공적으로 취소되었습니다.`;
+                document.getElementById('removeReservationForm').reset();
+            } else {
+                const errorText = await response.text();
+                throw new Error(`취소 실패: ${errorText || '비밀번호가 일치하지 않거나 해당 예약이 존재하지 않습니다.'}`);
+            }
+        } catch (error) {
+            resultArea.textContent = `🚨 취소 요청 실패: ${error.message}`;
+        }
+    });
+
+    // 초기 로드
+    document.addEventListener('DOMContentLoaded', showRoomList);
+
+    // 브라우저 뒤로가기/앞으로가기 버튼 처리
+    window.addEventListener('popstate', (event) => {
+        const path = location.pathname;
+        if (path === '/') {
+            showRoomList();
+        } else if (path.startsWith('/reserve/')) {
+            const roomId = path.split('/')[2];
+            document.getElementById('formRoomId').value = roomId;
+            document.getElementById('form-title').textContent = `✅ Room ${roomId} 예약 생성`;
+            switchView('reservation-form-container');
+        } else if (path.startsWith('/status/')) {
+            const roomId = path.split('/')[2];
+            document.getElementById('statusRoomId').textContent = roomId;
+            showReservationStatus(roomId);
+        }
+    });
+</script>
+
+</body>
+</html>
