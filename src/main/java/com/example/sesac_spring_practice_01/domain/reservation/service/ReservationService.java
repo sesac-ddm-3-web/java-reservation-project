@@ -34,8 +34,8 @@ public class ReservationService {
         Room room = loadRoomOrThrow(roomId);
         validateTime(request);
         room.validateReservationAllowed(request.getStartTime().toLocalTime(), request.getEndTime().toLocalTime());
-        List<Reservation> bookedReservations = reservationRepository.findByRoomId(roomId);
-        isOverlappingWith(request, bookedReservations);
+        List<Reservation> bookedReservationsByRoom = reservationRepository.findByRoomId(roomId);
+        isOverlappingWith(request, bookedReservationsByRoom);
         Reservation reservation = Reservation.create(
                 roomId,
                 request.getStartTime(),
@@ -71,8 +71,8 @@ public class ReservationService {
         }
     }
 
-    private void isOverlappingWith(ReservationCreateReqDto request, List<Reservation> existing) {
-        boolean overlap = existing.stream()
+    private void isOverlappingWith(ReservationCreateReqDto request, List<Reservation> bookedReservationsByRoom) {
+        boolean overlap = bookedReservationsByRoom.stream()
                 .anyMatch(reservation -> reservation.overlaps(request.getStartTime(), request.getEndTime()));
         if (overlap){
             throw new ReservationTimeConflictException();
