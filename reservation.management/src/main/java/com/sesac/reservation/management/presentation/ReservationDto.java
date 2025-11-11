@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 public class ReservationDto {
     Integer id; // 예약 번호 (auto increment FROM database)
+    Integer roomId; // 예약한 방 번호
     String name; // 예약자명
     String phoneNumber; // 전화번호
     String password; // 비밀번호
@@ -45,5 +46,9 @@ public class ReservationDto {
 
     public LocalTime getEnd() {
         return end;
+    }
+
+    public Integer getRoomId() {
+        return roomId;
     }
 }

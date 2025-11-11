@@ -19,4 +19,14 @@ public class ListReservationRepository {
 
         return reservation;
     }
+
+    public List<Reservation> findByRoomId(Integer roomId) {
+        return reservations.stream()
+                .filter(r -> r.getRoomId().equals(roomId))
+                .toList();
+    }
+
+    public List<Reservation> findAll() {
+        return reservations;
+    }
 }

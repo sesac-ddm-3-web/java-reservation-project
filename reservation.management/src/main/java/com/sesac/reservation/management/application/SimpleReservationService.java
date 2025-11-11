@@ -7,6 +7,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SimpleReservationService {
     private ListReservationRepository listReservationRepository;
@@ -26,5 +28,25 @@ public class SimpleReservationService {
         ReservationDto savedReservationDto = modelMapper.map(savedReservation, ReservationDto.class);
 
         return savedReservationDto;
+    }
+
+    public List<ReservationDto> findByRoomId(Integer roomId) {
+        List<Reservation> reservations = listReservationRepository.findByRoomId(roomId);
+
+        List<ReservationDto> reservationDtos = reservations.stream()
+                .map(r -> modelMapper.map(r, ReservationDto.class))
+                .toList();
+
+        return reservationDtos;
+    }
+
+    public List<ReservationDto> findAll() {
+        List<Reservation> reservations = listReservationRepository.findAll();
+
+        List<ReservationDto> reservationDtos = reservations.stream()
+                .map(r -> modelMapper.map(r, ReservationDto.class))
+                .toList();
+
+        return reservationDtos;
     }
 }
