@@ -135,6 +135,35 @@ Response:
 
 #### 예약
 
+##### 예약 조회
+
+```text
+GET /rooms/{meetingRoomId}/reservations/{reservationId}
+
+{
+  "id": 1,
+  "startTime": "2025-11-11T10:00:00",
+  "endTime": "2025-11-11T12:00:00",
+  "attendeeCount" : 5,
+  "organizer": {
+    "name": "예약자1",
+    "phoneNumber": "010-1234-5678",
+    "password": "1234"
+  }
+}
+```
+
+| 필드                                   | 타입            | 설명           |
+| ------------------------------------ | ------------- | ------------ |
+| id                    | Long          | 예약 ID        |
+| startTime             | LocalDateTime | 회의실 사용 시작 시간 |
+| endTime               | LocalDateTime | 회의실 사용 종료 시간 |
+| organizer             | Object        | 비회원 예약자 정보   |
+| organizer.name        | String        | 이름           |
+| organizer.phoneNumber | String        | 전화번호         |
+| organizer.password    | String        | 비밀번호         |
+
+
 ##### 회의실 예약 조회
 
 ```text
@@ -146,6 +175,7 @@ GET /rooms/{meetingRoomId}/reservations
       "id": 1,
       "startTime": "2025-11-11T10:00:00",
       "endTime": "2025-11-11T12:00:00",
+      "attendeeCount" : 5,
       "organizer": {
         "name": "예약자1",
         "phoneNumber": "010-1234-5678",
@@ -156,6 +186,7 @@ GET /rooms/{meetingRoomId}/reservations
       "id": 2,
       "startTime": "2025-11-11T14:00:00",
       "endTime": "2025-11-11T16:00:00",
+      "attendeeCount" : 3,
       "organizer": {
         "name": "예약자2",
         "phoneNumber": "010-5678-1234",
