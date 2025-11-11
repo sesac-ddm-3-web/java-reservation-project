@@ -10,5 +10,7 @@ public interface ReservationRepository {
 
     void delete(MeetingRoomId meetingRoomId, Long id);
 
+    Reservation find(MeetingRoomId meetingRoomId, Long id);
+
     Reservations findAll(MeetingRoomId meetingRoomId);
 }

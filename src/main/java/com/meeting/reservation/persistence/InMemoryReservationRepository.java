@@ -47,6 +47,20 @@ public class InMemoryReservationRepository implements ReservationRepository {
     }
 
     @Override
+    public Reservation find(MeetingRoomId meetingRoomId, Long id) {
+        List<Reservation> reservationList = reservations.get(meetingRoomId);
+
+        if (reservationList == null) {
+            throw new MeetingRoomNotFoundException();
+        }
+
+        return reservationList.stream()
+                              .filter(reservation -> reservation.isEqualId(id))
+                              .findAny()
+                              .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    @Override
     public Reservations findAll(MeetingRoomId meetingRoomId) {
         List<Reservation> reservationList = reservations.get(meetingRoomId);
 

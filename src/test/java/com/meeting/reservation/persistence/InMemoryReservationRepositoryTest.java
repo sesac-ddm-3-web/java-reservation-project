@@ -78,7 +78,7 @@ class InMemoryReservationRepositoryTest {
     }
 
     @Test
-    void 존재하지_않는_회의실의_예약을_삭제하려_하면_예외가_발생한다() {
+    void 존재하지_않는_회의실의_예약은_삭제할_수_없다() {
         // given
         InMemoryReservationRepository repository = new InMemoryReservationRepository();
         MeetingRoomId meetingRoomId = MeetingRoomId.create(999L);
@@ -90,7 +90,7 @@ class InMemoryReservationRepositoryTest {
     }
 
     @Test
-    void 존재하지_않는_예약_ID를_삭제하려_하면_예외가_발생한다() {
+    void 존재하지_않는_예약_ID로는_예약을_삭제할_수_없다() {
         // given
         InMemoryReservationRepository repository = new InMemoryReservationRepository();
         MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
@@ -165,5 +165,52 @@ class InMemoryReservationRepositoryTest {
                 () -> assertThat(room1Reservations.getReservations()).hasSize(2),
                 () -> assertThat(room2Reservations.getReservations()).hasSize(1)
         );
+    }
+
+    @Test
+    void 예약을_조회한다() {
+        // given
+        InMemoryReservationRepository repository = new InMemoryReservationRepository();
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusHours(1L);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        Reservation saved = repository.save(reservation);
+
+        // when
+        Reservation actual = repository.find(meetingRoomId, saved.getId().getValue());
+
+        // then
+        assertThat(actual.getId().getValue()).isEqualTo(saved.getId().getValue());
+    }
+
+    @Test
+    void 존재하지_않는_회의실의_예약은_조회할_수_없다() {
+        // given
+        InMemoryReservationRepository repository = new InMemoryReservationRepository();
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(999L);
+
+        // when & then
+        assertThatThrownBy(() -> repository.find(meetingRoomId, 1L))
+                .isInstanceOf(MeetingRoomNotFoundException.class)
+                .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
+    }
+
+    @Test
+    void 존재하지_않는_예약_ID로는_예약을_조회할_수_없다() {
+        // given
+        InMemoryReservationRepository repository = new InMemoryReservationRepository();
+        MeetingRoomId meetingRoomId = MeetingRoomId.create(1L);
+        Organizer organizer = Organizer.create("예약자", "010-1234-5678", "1234");
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusHours(1L);
+        Reservation reservation = Reservation.create(meetingRoomId, organizer, startTime, endTime, 5);
+        repository.save(reservation);
+
+        // when & then
+        assertThatThrownBy(() -> repository.find(meetingRoomId, -999L))
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
     }
 }
