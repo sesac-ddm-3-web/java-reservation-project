@@ -1,5 +1,6 @@
 package com.meeting.reservation.application;
 
+import com.meeting.reservation.application.dto.request.EquipmentUsageDto;
 import com.meeting.reservation.domain.reservation.Reservation;
 import com.meeting.reservation.domain.reservation.ReservationFactory;
 import com.meeting.reservation.domain.reservation.ReservationFrequency;
@@ -30,7 +31,8 @@ public class ReservationService {
             Long meetingRoomId,
             Organizer organizer,
             TimeSlot timeSlot,
-            int attendeeCount
+            int attendeeCount,
+            List<EquipmentUsageDto> equipmentUsages
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
@@ -38,7 +40,8 @@ public class ReservationService {
                 meetingRoom,
                 organizer,
                 timeSlot,
-                attendeeCount
+                attendeeCount,
+                equipmentUsages
         );
 
         return reservationRepository.save(reservation)
@@ -50,19 +53,20 @@ public class ReservationService {
             Organizer organizer,
             TimeSlot timeSlot,
             int attendeeCount,
-            String frequencyName,
-            int repeatCount
+            ReservationFrequency reservationFrequency,
+            int repeatCount,
+            List<EquipmentUsageDto> equipmentUsageDtos
     ) {
         MeetingRooms meetingRooms = meetingRoomRepository.findAll();
         MeetingRoom meetingRoom = meetingRooms.findMeetingRoom(meetingRoomId);
-        ReservationFrequency reservationFrequency = ReservationFrequency.find(frequencyName);
         List<Reservation> reservations = reservationFactory.create(
                 meetingRoom,
                 organizer,
                 timeSlot,
                 attendeeCount,
                 reservationFrequency,
-                repeatCount
+                repeatCount,
+                equipmentUsageDtos
         );
 
         reservationRepository.saveAll(reservations);

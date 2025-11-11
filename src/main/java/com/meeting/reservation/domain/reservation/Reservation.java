@@ -1,5 +1,7 @@
 package com.meeting.reservation.domain.reservation;
 
+import com.meeting.reservation.domain.equipment.vo.EquipmentId;
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsages;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
@@ -17,19 +19,22 @@ public class Reservation {
     private final TimeSlot timeSlot;
     private final int attendeeCount;
     private final Organizer organizer;
+    private final EquipmentUsages equipmentUsages;
 
     Reservation(
             ReservationId id,
             MeetingRoomId meetingRoomId,
             TimeSlot timeSlot,
             int attendeeCount,
-            Organizer organizer
+            Organizer organizer,
+            EquipmentUsages equipmentUsages
     ) {
         this.id = id;
         this.meetingRoomId = meetingRoomId;
         this.timeSlot = timeSlot;
         this.attendeeCount = attendeeCount;
         this.organizer = organizer;
+        this.equipmentUsages = equipmentUsages;
     }
 
     public Reservation withAssignedId(Long id) {
@@ -40,7 +45,8 @@ public class Reservation {
                 this.meetingRoomId,
                 this.timeSlot,
                 this.attendeeCount,
-                this.organizer
+                this.organizer,
+                this.equipmentUsages
         );
     }
 
@@ -52,12 +58,17 @@ public class Reservation {
                 this.meetingRoomId,
                 shiftTimeSlot,
                 this.attendeeCount,
-                this.organizer
+                this.organizer,
+                this.equipmentUsages
         );
     }
 
     public boolean overlapTime(Reservation other) {
-        return timeSlot.overlapTime(other.timeSlot);
+        return this.timeSlot.overlapTime(other.timeSlot);
+    }
+
+    public boolean overlapTime(TimeSlot timeSlot) {
+        return this.timeSlot.overlapTime(timeSlot);
     }
 
     public boolean afterStartTime(LocalDateTime now) {
@@ -70,5 +81,9 @@ public class Reservation {
 
     public boolean isEqualId(Long id) {
         return this.id.isEqualId(id);
+    }
+
+    public int getEquipmentQuantity(EquipmentId equipmentId) {
+        return equipmentUsages.getQuantity(equipmentId);
     }
 }

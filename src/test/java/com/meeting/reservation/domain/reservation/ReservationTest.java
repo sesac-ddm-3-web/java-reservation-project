@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsages;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // then
@@ -71,14 +74,16 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
         Reservation second = new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // when
@@ -99,7 +104,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // when
@@ -121,7 +127,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // when & then
@@ -141,7 +148,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // when
@@ -162,7 +170,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -183,7 +192,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -207,7 +217,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -234,7 +245,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -261,7 +273,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -288,7 +301,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when
@@ -315,7 +329,8 @@ class ReservationTest {
                 meetingRoomId,
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         // when

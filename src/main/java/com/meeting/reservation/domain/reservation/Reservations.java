@@ -1,5 +1,7 @@
 package com.meeting.reservation.domain.reservation;
 
+import com.meeting.reservation.domain.equipment.vo.EquipmentId;
+import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -46,6 +48,13 @@ public class Reservations {
         if (!target.matchPassword(password)) {
             throw new InvalidReservationPasswordException();
         }
+    }
+
+    public int getTotalEquipmentQuantity(EquipmentId id, TimeSlot timeSlot) {
+        return values.stream()
+                .filter(reservation -> reservation.overlapTime(timeSlot))
+                     .map(reservation -> reservation.getEquipmentQuantity(id))
+                     .reduce(0, Integer::sum);
     }
 
     public List<Reservation> getReservations() {

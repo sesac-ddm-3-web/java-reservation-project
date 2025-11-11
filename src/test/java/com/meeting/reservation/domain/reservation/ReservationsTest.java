@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsages;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -28,7 +30,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
 
         // when
@@ -48,7 +51,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -61,7 +65,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot2,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(2L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -80,7 +85,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -93,7 +99,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot2,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -114,7 +121,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -123,7 +131,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(2L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -144,7 +153,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -165,7 +175,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -186,7 +197,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -207,7 +219,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(reservation));
@@ -228,7 +241,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -246,14 +260,16 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot2,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(2L);
         Reservation targetReservation2 = new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 MeetingRoomId.create(1L),
                 timeSlot3,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(3L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(existingReservation));
@@ -264,7 +280,7 @@ class ReservationsTest {
     }
 
     @Test
-    void 반복_예약_중_하나가_기존_예약과_동등하면_예외가_발생한다() {
+    void 반복_예약_중_하나가_기존_예약과_동등하면_반복_예외_전체를_취소한다() {
         // given
         Organizer organizer1 = createOrganizer("예약자1", "010-5678-1234", "1234");
         TimeSlot timeSlot1 = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusHours(1L));
@@ -273,7 +289,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -287,14 +304,16 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot2,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(2L);
         Reservation targetReservation2 = new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(existingReservation));
@@ -307,7 +326,7 @@ class ReservationsTest {
     }
 
     @Test
-    void 반복_예약_중_하나가_기존_예약과_시간이_겹치면_예외가_발생한다() {
+    void 반복_예약_중_하나가_기존_예약과_시간이_겹치면_반복_예약_전체를_취소한다() {
         // given
         Organizer organizer1 = createOrganizer("예약자1", "010-5678-1234", "1234");
         TimeSlot timeSlot1 = TimeSlot.create(LocalDateTime.now(), LocalDateTime.now().plusHours(2L));
@@ -316,7 +335,8 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot1,
                 5,
-                organizer1
+                organizer1,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(1L);
 
         Organizer organizer2 = createOrganizer("예약자2", "010-1234-5678", "4321");
@@ -334,14 +354,16 @@ class ReservationsTest {
                 MeetingRoomId.create(1L),
                 timeSlot2,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(2L);
         Reservation targetReservation2 = new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 MeetingRoomId.create(1L),
                 timeSlot3,
                 5,
-                organizer2
+                organizer2,
+                EquipmentUsages.create(Collections.emptyMap())
         ).withAssignedId(3L);
 
         Reservations reservations = Reservations.create(MeetingRoomId.create(1L), List.of(existingReservation));

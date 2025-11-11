@@ -24,8 +24,9 @@ import org.junit.jupiter.api.Test;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class InMemoryReservationRepositoryTest {
 
-    private final InMemoryReservationRepository repository = new InMemoryReservationRepository();
-    private final ReservationFactory reservationFactory = new ReservationFactory(repository);
+    private final InMemoryReservationRepository reservationRepository = new InMemoryReservationRepository();
+    private final InMemoryEquipmentRepository equipmentRepository = new InMemoryEquipmentRepository();
+    private final ReservationFactory reservationFactory = new ReservationFactory(equipmentRepository, reservationRepository);
 
     @Test
     void 예약을_저장한다() {
@@ -33,10 +34,10 @@ class InMemoryReservationRepositoryTest {
         MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5, List.of());
 
         // when
-        Reservation actual = repository.save(reservation);
+        Reservation actual = reservationRepository.save(reservation);
 
         // then
         assertThat(actual.getId().getValue()).isEqualTo(1L);
@@ -52,12 +53,12 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5, List.of());
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5, List.of());
 
         // when
-        Reservation saved1 = repository.save(reservation1);
-        Reservation saved2 = repository.save(reservation2);
+        Reservation saved1 = reservationRepository.save(reservation1);
+        Reservation saved2 = reservationRepository.save(reservation2);
 
         // then
         assertAll(
@@ -80,12 +81,12 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(2L),
                 LocalDateTime.now().plusDays(2L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
-        Reservation reservation3 = reservationFactory.create(meetingRoom, organizer, timeSlot3, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5, List.of());
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5, List.of());
+        Reservation reservation3 = reservationFactory.create(meetingRoom, organizer, timeSlot3, 5, List.of());
 
         // when
-        List<Reservation> actual = repository.saveAll(List.of(reservation1, reservation2, reservation3));
+        List<Reservation> actual = reservationRepository.saveAll(List.of(reservation1, reservation2, reservation3));
 
         // then
         assertThat(actual).hasSize(3);
@@ -101,11 +102,11 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5, List.of());
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5, List.of());
 
         // when
-        List<Reservation> actual = repository.saveAll(List.of(reservation1, reservation2));
+        List<Reservation> actual = reservationRepository.saveAll(List.of(reservation1, reservation2));
 
         // then
         assertAll(
@@ -120,21 +121,22 @@ class InMemoryReservationRepositoryTest {
         MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
-        Reservation saved = repository.save(reservation);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5, List.of());
+        Reservation saved = reservationRepository.save(reservation);
 
         // when
-        repository.delete(MeetingRoomId.create(1L), saved.getId().getValue());
-        Reservations actual = repository.findAll(MeetingRoomId.create(1L));
+        reservationRepository.delete(MeetingRoomId.create(1L), saved.getId().getValue());
 
         // then
+        Reservations actual = reservationRepository.findAll(MeetingRoomId.create(1L));
+
         assertThat(actual.getReservations()).isEmpty();
     }
 
     @Test
     void 존재하지_않는_회의실의_예약은_삭제할_수_없다() {
         // given & when & then
-        assertThatThrownBy(() -> repository.delete(MeetingRoomId.create(999L), 1L))
+        assertThatThrownBy(() -> reservationRepository.delete(MeetingRoomId.create(999L), 1L))
                 .isInstanceOf(MeetingRoomNotFoundException.class)
                 .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
@@ -145,11 +147,11 @@ class InMemoryReservationRepositoryTest {
         MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
-        repository.save(reservation);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5, List.of());
+        reservationRepository.save(reservation);
 
         // when & then
-        assertThatThrownBy(() -> repository.delete(MeetingRoomId.create(1L), -999L))
+        assertThatThrownBy(() -> reservationRepository.delete(MeetingRoomId.create(1L), -999L))
                 .isInstanceOf(ReservationNotFoundException.class)
                 .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
     }
@@ -157,7 +159,7 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 예약이_없는_회의실의_모든_예약을_조회하면_빈_목록을_반환한다() {
         // given & when
-        Reservations actual = repository.findAll(MeetingRoomId.create(1L));
+        Reservations actual = reservationRepository.findAll(MeetingRoomId.create(1L));
 
         // then
         assertThat(actual.getReservations()).isEmpty();
@@ -173,13 +175,13 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(1L),
                 LocalDateTime.now().plusDays(1L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5);
-        repository.save(reservation1);
-        repository.save(reservation2);
+        Reservation reservation1 = reservationFactory.create(meetingRoom, organizer, timeSlot1, 5, List.of());
+        Reservation reservation2 = reservationFactory.create(meetingRoom, organizer, timeSlot2, 5, List.of());
+        reservationRepository.save(reservation1);
+        reservationRepository.save(reservation2);
 
         // when
-        Reservations actual = repository.findAll(MeetingRoomId.create(1L));
+        Reservations actual = reservationRepository.findAll(MeetingRoomId.create(1L));
 
         // then
         assertThat(actual.getReservations()).hasSize(2);
@@ -200,17 +202,17 @@ class InMemoryReservationRepositoryTest {
                 LocalDateTime.now().plusDays(2L),
                 LocalDateTime.now().plusDays(2L).plusHours(1L)
         );
-        Reservation reservation1 = reservationFactory.create(meetingRoom1, organizer, timeSlot1, 5);
-        Reservation reservation2 = reservationFactory.create(meetingRoom1, organizer, timeSlot2, 5);
-        Reservation reservation3 = reservationFactory.create(meetingRoom2, organizer, timeSlot3, 5);
+        Reservation reservation1 = reservationFactory.create(meetingRoom1, organizer, timeSlot1, 5, List.of());
+        Reservation reservation2 = reservationFactory.create(meetingRoom1, organizer, timeSlot2, 5, List.of());
+        Reservation reservation3 = reservationFactory.create(meetingRoom2, organizer, timeSlot3, 5, List.of());
 
         // when
-        repository.save(reservation1);
-        repository.save(reservation2);
-        repository.save(reservation3);
+        reservationRepository.save(reservation1);
+        reservationRepository.save(reservation2);
+        reservationRepository.save(reservation3);
 
-        Reservations room1Reservations = repository.findAll(MeetingRoomId.create(1L));
-        Reservations room2Reservations = repository.findAll(MeetingRoomId.create(2L));
+        Reservations room1Reservations = reservationRepository.findAll(MeetingRoomId.create(1L));
+        Reservations room2Reservations = reservationRepository.findAll(MeetingRoomId.create(2L));
 
         // then
         assertAll(
@@ -225,11 +227,11 @@ class InMemoryReservationRepositoryTest {
         MeetingRoom meetingRoom = createMeetingRoom(1L);
         Organizer organizer = createOrganizer();
         TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
-        Reservation saved = repository.save(reservation);
+        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5, List.of());
+        Reservation saved = reservationRepository.save(reservation);
 
         // when
-        Reservation actual = repository.find(MeetingRoomId.create(1L), saved.getId().getValue());
+        Reservation actual = reservationRepository.find(MeetingRoomId.create(1L), saved.getId().getValue());
 
         // then
         assertThat(actual.getId().getValue()).isEqualTo(saved.getId().getValue());
@@ -238,27 +240,19 @@ class InMemoryReservationRepositoryTest {
     @Test
     void 존재하지_않는_회의실의_예약은_조회할_수_없다() {
         // given & when & then
-        assertThatThrownBy(() -> repository.find(MeetingRoomId.create(999L), 1L))
+        assertThatThrownBy(() -> reservationRepository.find(MeetingRoomId.create(999L), 1L))
                 .isInstanceOf(MeetingRoomNotFoundException.class)
                 .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
 
     @Test
     void 존재하지_않는_예약_ID로는_예약을_조회할_수_없다() {
-        // given
-        MeetingRoom meetingRoom = createMeetingRoom(1L);
-        Organizer organizer = createOrganizer();
-        TimeSlot timeSlot = createTimeSlot();
-        Reservation reservation = reservationFactory.create(meetingRoom, organizer, timeSlot, 5);
-        repository.save(reservation);
-
         // when & then
-        assertThatThrownBy(() -> repository.find(MeetingRoomId.create(1L), -999L))
-                .isInstanceOf(ReservationNotFoundException.class)
-                .hasMessage("지정한 ID에 대한 예약을 찾지 못했습니다.");
+        assertThatThrownBy(() -> reservationRepository.find(MeetingRoomId.create(1L), -999L))
+                .isInstanceOf(MeetingRoomNotFoundException.class)
+                .hasMessage("지정한 회의실 ID에 대한 예약을 찾지 못했습니다.");
     }
 
-    // 헬퍼 메서드
     private MeetingRoom createMeetingRoom(Long meetingRoomId) {
         return MeetingRoom.create(
                                   "회의실 A",

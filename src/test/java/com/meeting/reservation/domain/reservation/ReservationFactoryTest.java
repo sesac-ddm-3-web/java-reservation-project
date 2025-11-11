@@ -4,14 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsages;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomLocation;
+import com.meeting.reservation.persistence.InMemoryEquipmentRepository;
 import com.meeting.reservation.persistence.InMemoryReservationRepository;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -24,7 +27,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ReservationFactoryTest {
 
     private final InMemoryReservationRepository reservationRepository = new InMemoryReservationRepository();
-    private final ReservationFactory reservationFactory = new ReservationFactory(reservationRepository);
+    private final InMemoryEquipmentRepository equipmentRepository = new InMemoryEquipmentRepository();
+    private final ReservationFactory reservationFactory = new ReservationFactory(equipmentRepository, reservationRepository);
 
     @Test
     void 예약을_생성한다() {
@@ -38,7 +42,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 organizer,
                 timeSlot,
-                5
+                5,
+                List.of()
         );
 
         // then
@@ -61,7 +66,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 null,
                 timeSlot,
-                5
+                5,
+                List.of()
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약자 정보는 비어 있을 수 없습니다.");
@@ -78,7 +84,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 organizer,
                 null,
-                5
+                5,
+                List.of()
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약 시간은 비어 있을 수 없습니다.");
@@ -97,7 +104,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 organizer,
                 timeSlot,
-                attendeeCount
+                attendeeCount,
+                List.of()
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("참가 인원은 양수여야 합니다.");
@@ -115,7 +123,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 organizer,
                 timeSlot,
-                100
+                100,
+                List.of()
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 회의실은 참가 인원을 전부 수용할 수 없습니다.");
@@ -133,7 +142,8 @@ class ReservationFactoryTest {
                 MeetingRoomId.create(1L),
                 timeSlot,
                 5,
-                organizer
+                organizer,
+                EquipmentUsages.create(Collections.emptyMap())
         );
         reservationRepository.save(existingReservation);
 
@@ -142,7 +152,8 @@ class ReservationFactoryTest {
                 meetingRoom,
                 organizer,
                 timeSlot,
-                5
+                5,
+                List.of()
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 시간이 겹치는 예약이 존재합니다.");
@@ -162,7 +173,8 @@ class ReservationFactoryTest {
                 timeSlot,
                 5,
                 ReservationFrequency.DAILY,
-                2
+                2,
+                List.of()
         );
 
         // then
@@ -186,7 +198,8 @@ class ReservationFactoryTest {
                 timeSlot,
                 5,
                 ReservationFrequency.WEEKLY,
-                2
+                2,
+                List.of()
         );
 
         // then
@@ -211,7 +224,8 @@ class ReservationFactoryTest {
                 timeSlot,
                 5,
                 ReservationFrequency.DAILY,
-                1
+                1,
+                List.of()
         );
 
         // then
@@ -222,7 +236,6 @@ class ReservationFactoryTest {
         );
     }
 
-    // 헬퍼 메서드
     private MeetingRoom createMeetingRoom(Long meetingRoomId) {
         return MeetingRoom.create(
                                   "회의실 A",

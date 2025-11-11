@@ -1,12 +1,22 @@
 package com.meeting.reservation.domain.reservation;
 
+import com.meeting.reservation.application.dto.request.EquipmentUsageDto;
+import com.meeting.reservation.domain.equipment.Equipment;
+import com.meeting.reservation.domain.equipment.Equipments;
+import com.meeting.reservation.domain.equipment.repository.EquipmentRepository;
+import com.meeting.reservation.domain.equipment.vo.EquipmentId;
 import com.meeting.reservation.domain.reservation.repository.ReservationRepository;
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsage;
+import com.meeting.reservation.domain.reservation.vo.EquipmentUsages;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
 import com.meeting.reservation.domain.room.MeetingRoom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,33 +24,72 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public final class ReservationFactory {
 
+    private final EquipmentRepository equipmentRepository;
     private final ReservationRepository reservationRepository;
 
     public Reservation create(
             MeetingRoom meetingRoom,
             Organizer organizer,
             TimeSlot timeSlot,
-            int attendeeCount
+            int attendeeCount,
+            List<EquipmentUsageDto> equipmentUsageDtos
     ) {
         meetingRoom.validateAttendeeCount(attendeeCount);
 
         Reservations reservations = reservationRepository.findAll(meetingRoom.getId());
+        Equipments equipments = equipmentRepository.findAll(meetingRoom.getId());
 
         validateOrganizer(organizer);
         validateTimeSlot(timeSlot);
         validateAttendeeCount(attendeeCount);
+
+        Map<EquipmentId, EquipmentUsage> validatedEquipmentUsages =
+                convertEquipmentUsages(equipmentUsageDtos, reservations, timeSlot, equipments);
 
         Reservation reservation = new Reservation(
                 ReservationId.EMPTY_RESERVATION_ID,
                 meetingRoom.getId(),
                 timeSlot,
                 attendeeCount,
-                organizer
+                organizer,
+                EquipmentUsages.create(validatedEquipmentUsages)
         );
 
         reservations.validateReserve(reservation);
 
         return reservation;
+    }
+
+    private Map<EquipmentId, EquipmentUsage> convertEquipmentUsages(
+            List<EquipmentUsageDto> equipmentUsageDtos,
+            Reservations reservations,
+            TimeSlot timeSlot,
+            Equipments equipments
+    ) {
+        return equipmentUsageDtos.stream()
+                                 .map(dto -> createEquipmentUsage(dto, reservations, timeSlot, equipments))
+                                 .collect(Collectors.toMap(
+                                         EquipmentUsage::getEquipmentId,
+                                         Function.identity()
+                                 ));
+    }
+
+    private EquipmentUsage createEquipmentUsage(
+            EquipmentUsageDto dto,
+            Reservations reservations,
+            TimeSlot timeSlot,
+            Equipments equipments
+    ) {
+        Equipment equipment = equipments.find(dto.id());
+
+        int usedQuantity = reservations.getTotalEquipmentQuantity(dto.id(), timeSlot);
+        int needQuantity = dto.quantity() + usedQuantity;
+
+        if (!equipment.canProvide(needQuantity)) {
+            throw new IllegalArgumentException("비품 수량이 부족합니다.");
+        }
+
+        return EquipmentUsage.create(dto.id(), equipment.getName(), dto.quantity());
     }
 
     public List<Reservation> create(
@@ -49,13 +98,15 @@ public final class ReservationFactory {
             TimeSlot timeSlot,
             int attendeeCount,
             ReservationFrequency frequency,
-            int repeatCount
+            int repeatCount,
+            List<EquipmentUsageDto> equipmentUsagesDtos
     ) {
         Reservation startReservation = this.create(
                 meetingRoom,
                 organizer,
                 timeSlot,
-                attendeeCount
+                attendeeCount,
+                equipmentUsagesDtos
         );
         List<Reservation> reservationList = new ArrayList<>();
 
@@ -89,3 +140,4 @@ public final class ReservationFactory {
         }
     }
 }
+

@@ -1,7 +1,9 @@
 package com.meeting.reservation.presentation.reservation;
 
 import com.meeting.reservation.application.ReservationService;
+import com.meeting.reservation.application.dto.request.EquipmentUsageDto;
 import com.meeting.reservation.domain.reservation.Reservation;
+import com.meeting.reservation.domain.reservation.ReservationFrequency;
 import com.meeting.reservation.domain.reservation.vo.Organizer;
 import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.domain.reservation.vo.TimeSlot;
@@ -40,17 +42,15 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<Void> reserve(@PathVariable Long meetingRoomId, @Valid @RequestBody ReserveRequest request) {
-        Organizer organizer = Organizer.create(
-                request.organizer().name(),
-                request.organizer().phoneNumber(),
-                request.organizer().password()
-        );
-        TimeSlot timeSlot = TimeSlot.create(request.startTime(), request.endTime());
+        Organizer organizer = request.toOrganizer();
+        TimeSlot timeSlot = request.toTimeSlot();
+        List<EquipmentUsageDto> equipmentUsages = request.toEquipmentUsages();
         ReservationId reservationId = reservationService.reserve(
                 meetingRoomId,
                 organizer,
                 timeSlot,
-                request.attendeeCount()
+                request.attendeeCount(),
+                equipmentUsages
         );
         URI location = URI.create("/rooms/" + meetingRoomId + "/reservations" + reservationId.getValue());
 
@@ -63,20 +63,19 @@ public class ReservationController {
             @PathVariable Long meetingRoomId,
             @Valid @RequestBody RepeatReserveRequest request
     ) {
-        Organizer organizer = Organizer.create(
-                request.organizer().name(),
-                request.organizer().phoneNumber(),
-                request.organizer().password()
-        );
-        TimeSlot timeSlot = TimeSlot.create(request.startTime(), request.endTime());
+        Organizer organizer = request.toOrganizer();
+        TimeSlot timeSlot = request.toTimeSlot();
+        ReservationFrequency reservationFrequency = ReservationFrequency.find(request.frequency());
+        List<EquipmentUsageDto> equipmentUsageDtos = request.toEquipmentUsages();
 
         reservationService.repeatReserve(
                 meetingRoomId,
                 organizer,
                 timeSlot,
                 request.attendeeCount(),
-                request.frequency(),
-                request.repeatCount()
+                reservationFrequency,
+                request.repeatCount(),
+                equipmentUsageDtos
         );
 
         URI location = URI.create("/rooms/" + meetingRoomId + "/reservations");
