@@ -197,12 +197,12 @@ class ReservationTest {
                                              .withAssignedId(1L);
 
         // when
-        Reservation actual = reservation.shift(ReservationFrequency.DAILY, 3L);
+        Reservation actual = reservation.shift(ReservationFrequency.DAILY);
 
         // then
         assertAll(
-                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 10, 0)),
-                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 12, 0))
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 12, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 12, 12, 0))
         );
     }
 
@@ -217,12 +217,12 @@ class ReservationTest {
                                              .withAssignedId(1L);
 
         // when
-        Reservation actual = reservation.shift(ReservationFrequency.WEEKLY, 2L);
+        Reservation actual = reservation.shift(ReservationFrequency.WEEKLY);
 
         // then
         assertAll(
-                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 10, 0)),
-                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 12, 0))
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 18, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 18, 12, 0))
         );
     }
 
@@ -237,12 +237,12 @@ class ReservationTest {
                                              .withAssignedId(1L);
 
         // when
-        Reservation actual = reservation.shift(ReservationFrequency.MONTHLY, 3L);
+        Reservation actual = reservation.shift(ReservationFrequency.MONTHLY);
 
         // then
         assertAll(
-                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 10, 0)),
-                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 12, 0))
+                () -> assertThat(actual.getTimeSlot().getStartTime()).isEqualTo(LocalDateTime.of(2025, 2, 15, 10, 0)),
+                () -> assertThat(actual.getTimeSlot().getEndTime()).isEqualTo(LocalDateTime.of(2025, 2, 15, 12, 0))
         );
     }
 
@@ -257,7 +257,7 @@ class ReservationTest {
                                              .withAssignedId(1L);
 
         // when
-        Reservation actual = reservation.shift(ReservationFrequency.YEARLY, 1L);
+        Reservation actual = reservation.shift(ReservationFrequency.YEARLY);
 
         // then
         assertAll(
@@ -277,7 +277,7 @@ class ReservationTest {
                                              .withAssignedId(1L);
 
         // when
-        Reservation actual = reservation.shift(ReservationFrequency.DAILY, 1L);
+        Reservation actual = reservation.shift(ReservationFrequency.DAILY);
 
         // then
         assertAll(

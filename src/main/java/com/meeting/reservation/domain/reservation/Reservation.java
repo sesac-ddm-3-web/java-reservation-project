@@ -75,8 +75,8 @@ public class Reservation {
         );
     }
 
-    public Reservation shift(ReservationFrequency frequency, long amount) {
-        TimeSlot shiftTimeSlot = this.timeSlot.shiftBy(frequency, amount);
+    public Reservation shift(ReservationFrequency frequency) {
+        TimeSlot shiftTimeSlot = this.timeSlot.shiftBy(frequency);
 
         return new Reservation(
                 this.id,

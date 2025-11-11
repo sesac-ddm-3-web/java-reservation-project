@@ -48,65 +48,60 @@ class ReservationFrequencyTest {
     }
 
     @Test
-    void DAILY는_일_단위로_날짜를_더한다() {
+    void DAILY는_기존_날짜에_1일을_더한다() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        long amount = 3L;
 
         // when
-        LocalDateTime actual = ReservationFrequency.DAILY.addTo(dateTime, amount);
+        LocalDateTime actual = ReservationFrequency.DAILY.addTo(dateTime);
 
         // then
-        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 11, 14, 10, 0));
+        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 11, 12, 10, 0));
     }
 
     @Test
-    void WEEKLY는_주_단위로_날짜를_더한다() {
+    void WEEKLY는_기존_날짜에_1주를_더한다() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        long amount = 2L;
 
         // when
-        LocalDateTime actual = ReservationFrequency.WEEKLY.addTo(dateTime, amount);
+        LocalDateTime actual = ReservationFrequency.WEEKLY.addTo(dateTime);
 
         // then
-        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 11, 25, 10, 0));
+        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 11, 18, 10, 0));
     }
 
     @Test
-    void MONTHLY는_월_단위로_날짜를_더한다() {
+    void MONTHLY는_기존_날짜에_1달을_더한다() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 1, 15, 10, 0);
-        long amount = 3L;
 
         // when
-        LocalDateTime actual = ReservationFrequency.MONTHLY.addTo(dateTime, amount);
+        LocalDateTime actual = ReservationFrequency.MONTHLY.addTo(dateTime);
 
         // then
-        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 4, 15, 10, 0));
+        assertThat(actual).isEqualTo(LocalDateTime.of(2025, 2, 15, 10, 0));
     }
 
     @Test
-    void YEARLY는_년_단위로_날짜를_더한다() {
+    void YEARLY는_기존_날짜에_1년을_더한다() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 11, 11, 10, 0);
-        long amount = 2L;
 
         // when
-        LocalDateTime actual = ReservationFrequency.YEARLY.addTo(dateTime, amount);
+        LocalDateTime actual = ReservationFrequency.YEARLY.addTo(dateTime);
 
         // then
-        assertThat(actual).isEqualTo(LocalDateTime.of(2027, 11, 11, 10, 0));
+        assertThat(actual).isEqualTo(LocalDateTime.of(2026, 11, 11, 10, 0));
     }
 
     @Test
     void MONTHLY는_존재하지_않는_날짜를_해당_월의_마지막_날로_조정한다() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 10, 31, 10, 0);
-        long amount = 1L;
 
         // when
-        LocalDateTime actual = ReservationFrequency.MONTHLY.addTo(dateTime, amount);
+        LocalDateTime actual = ReservationFrequency.MONTHLY.addTo(dateTime);
 
         // then
         assertThat(actual).isEqualTo(LocalDateTime.of(2025, 11, 30, 10, 0));

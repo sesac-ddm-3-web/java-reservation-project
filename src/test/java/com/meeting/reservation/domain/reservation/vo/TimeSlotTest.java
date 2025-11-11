@@ -104,11 +104,11 @@ class TimeSlotTest {
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
 
         // when
-        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.DAILY, 3L);
+        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.DAILY);
 
         // then
-        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 10, 0));
-        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 14, 12, 0));
+        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 12, 10, 0));
+        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 12, 12, 0));
     }
 
     @Test
@@ -119,11 +119,11 @@ class TimeSlotTest {
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
 
         // when
-        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.WEEKLY, 2L);
+        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.WEEKLY);
 
         // then
-        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 10, 0));
-        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 25, 12, 0));
+        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 11, 18, 10, 0));
+        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 11, 18, 12, 0));
     }
 
     @Test
@@ -134,11 +134,11 @@ class TimeSlotTest {
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
 
         // when
-        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.MONTHLY, 3L);
+        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.MONTHLY);
 
         // then
-        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 10, 0));
-        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 4, 15, 12, 0));
+        assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2025, 2, 15, 10, 0));
+        assertThat(actual.getEndTime()).isEqualTo(LocalDateTime.of(2025, 2, 15, 12, 0));
     }
 
     @Test
@@ -149,7 +149,7 @@ class TimeSlotTest {
         TimeSlot timeSlot = TimeSlot.create(startTime, endTime);
 
         // when
-        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.YEARLY, 1L);
+        TimeSlot actual = timeSlot.shiftBy(ReservationFrequency.YEARLY);
 
         // then
         assertThat(actual.getStartTime()).isEqualTo(LocalDateTime.of(2026, 11, 11, 10, 0));

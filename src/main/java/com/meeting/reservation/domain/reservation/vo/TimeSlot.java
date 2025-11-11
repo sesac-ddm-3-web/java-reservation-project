@@ -34,10 +34,10 @@ public class TimeSlot {
         this.endTime = endTime;
     }
 
-    public TimeSlot shiftBy(ReservationFrequency frequency, long amount) {
+    public TimeSlot shiftBy(ReservationFrequency frequency) {
         return new TimeSlot(
-                frequency.addTo(this.startTime, amount),
-                frequency.addTo(this.endTime, amount)
+                frequency.addTo(this.startTime),
+                frequency.addTo(this.endTime)
         );
     }
 

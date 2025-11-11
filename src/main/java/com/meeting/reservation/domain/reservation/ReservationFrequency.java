@@ -23,7 +23,7 @@ public enum ReservationFrequency {
         this.dateAdder = dateAdder;
     }
 
-    public LocalDateTime addTo(LocalDateTime dateTime, long amount) {
-        return this.dateAdder.apply(dateTime, amount);
+    public LocalDateTime addTo(LocalDateTime dateTime) {
+        return this.dateAdder.apply(dateTime, 1L);
     }
 }
