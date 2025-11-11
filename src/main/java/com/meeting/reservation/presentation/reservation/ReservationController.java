@@ -7,8 +7,7 @@ import com.meeting.reservation.domain.reservation.vo.ReservationId;
 import com.meeting.reservation.presentation.reservation.dto.request.CancelReservationRequest;
 import com.meeting.reservation.presentation.reservation.dto.request.ReserveRequest;
 import com.meeting.reservation.presentation.reservation.dto.response.ReservationCollectionResponse;
-import com.meeting.reservation.presentation.reservation.dto.response.ReservationCollectionResponse.OrganizerResponse;
-import com.meeting.reservation.presentation.reservation.dto.response.ReservationCollectionResponse.ReservationResponse;
+import com.meeting.reservation.presentation.reservation.dto.response.ReservationResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -31,29 +30,10 @@ public class ReservationController {
 
     @GetMapping
     public ResponseEntity<ReservationCollectionResponse> findAll(@PathVariable Long meetingRoomId) {
-        List<ReservationResponse> responses = reservationService.findReservations(meetingRoomId)
-                                                                          .stream()
-                                                                          .map(this::mapToReservationResponse)
-                                                                          .toList();
+        List<Reservation> reservations = reservationService.findReservations(meetingRoomId);
 
         return ResponseEntity.ok()
-                .body(new ReservationCollectionResponse(responses));
-    }
-
-    private ReservationResponse mapToReservationResponse(Reservation reservation) {
-        OrganizerResponse organizerResponse = mapToOrganizerResponse(reservation.getOrganizer());
-
-        return new ReservationResponse(
-                reservation.getId().getValue(),
-                reservation.getStartTime(),
-                reservation.getEndTime(),
-                reservation.getAttendeeCount(),
-                organizerResponse
-        );
-    }
-
-    private OrganizerResponse mapToOrganizerResponse(Organizer organizer) {
-        return new OrganizerResponse(organizer.getName(), organizer.getPhoneNumber(), organizer.getPassword());
+                             .body(ReservationCollectionResponse.from(reservations));
     }
 
     @PostMapping
@@ -76,6 +56,16 @@ public class ReservationController {
                                      URI.create("/rooms/" + meetingRoomId + "/reservations" + reservationId.getValue())
                              )
                              .build();
+    }
+
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationResponse> find(
+            @PathVariable Long meetingRoomId,
+            @PathVariable Long reservationId
+    ) {
+        Reservation reservation = reservationService.findReservation(meetingRoomId, reservationId);
+
+        return ResponseEntity.ok(ReservationResponse.from(reservation));
     }
 
     @DeleteMapping("/{reservationId}")
