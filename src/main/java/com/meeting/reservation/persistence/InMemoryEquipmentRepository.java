@@ -5,6 +5,7 @@ import com.meeting.reservation.domain.equipment.Equipments;
 import com.meeting.reservation.domain.equipment.repository.EquipmentRepository;
 import com.meeting.reservation.domain.equipment.vo.EquipmentId;
 import com.meeting.reservation.domain.room.vo.MeetingRoomId;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Repository;
@@ -43,5 +44,10 @@ public class InMemoryEquipmentRepository implements EquipmentRepository {
     @Override
     public Equipments findAll(MeetingRoomId meetingRoomId) {
         return this.equipments.get(meetingRoomId);
+    }
+
+    @Override
+    public Map<MeetingRoomId, Equipments> findAll() {
+        return Collections.unmodifiableMap(equipments);
     }
 }
