@@ -24,7 +24,7 @@ public class RoomResDto {
         return new RoomResDto(room.getId(), room.getName(), room.getOpenAt(), room.getCloseAt());
     }
 
-    public static List<RoomResDto> fromDomains(List<Room> rooms) {
+    public static List<RoomResDto> fromEntities(List<Room> rooms) {
         return rooms.stream()
                 .map(RoomResDto::from)
                 .toList();

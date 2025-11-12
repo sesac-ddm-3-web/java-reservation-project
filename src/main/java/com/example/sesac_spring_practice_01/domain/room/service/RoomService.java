@@ -17,6 +17,6 @@ public class RoomService {
 
     public List<RoomResDto> getAllRooms() {
         List<Room> rooms = roomRepository.findAll();
-        return RoomResDto.fromDomains(rooms);
+        return RoomResDto.fromEntities(rooms);
     }
 }

@@ -9,6 +9,7 @@ import com.example.sesac_spring_practice_01.domain.reservation.service.Reservati
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,21 +22,23 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping("/{roomId}/reservations")
-    public List<ReservationStatusResDto> getAllReservations(@PathVariable Long roomId) {
-        return reservationService.getAllReservations(roomId);
+    public ResponseEntity<List<ReservationStatusResDto>> getAllReservations(@PathVariable Long roomId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(reservationService.getAllReservations(roomId));
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{roomId}/reservations")
-    public ReservationCompleteResDto createReservation(@PathVariable Long roomId,
+    public ResponseEntity<ReservationCompleteResDto> createReservation(@PathVariable Long roomId,
                                                        @Valid @RequestBody ReservationCreateReqDto request){
-        return reservationService.createReservation(roomId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(reservationService.createReservation(roomId, request));
     }
 
     @DeleteMapping("/{roomId}/reservations/{reservationId}")
-    public void deleteReservation(@PathVariable Long roomId,
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long roomId,
                                   @PathVariable Long reservationId,
                                   @Valid @RequestBody ReservationCancelReqDto request){
         reservationService.deleteReservation(roomId, reservationId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
