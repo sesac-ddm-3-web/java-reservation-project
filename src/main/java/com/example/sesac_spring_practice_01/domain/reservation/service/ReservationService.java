@@ -12,6 +12,7 @@ import com.example.sesac_spring_practice_01.domain.reservation.repository.Reserv
 import com.example.sesac_spring_practice_01.domain.room.Room;
 import com.example.sesac_spring_practice_01.domain.room.exception.RoomNotFoundException;
 import com.example.sesac_spring_practice_01.domain.room.repository.RoomRepository;
+import com.example.sesac_spring_practice_01.global.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +39,8 @@ public class ReservationService {
         isOverlappingWith(request, bookedReservationsByRoom);
         Reservation reservation = Reservation.create(
                 roomId,
-                request.getStartTime(),
-                request.getEndTime(),
+                TimeUtils.snapToMinute(request.getStartTime()),
+                TimeUtils.snapToMinute(request.getEndTime()),
                 request.getBookerName(),
                 request.getBookerPhone(),
                 request.getBookerPassword()
@@ -50,14 +51,18 @@ public class ReservationService {
 
     public void deleteReservation(Long roomId, Long reservationId, ReservationCancelReqDto request){
         loadRoomOrThrow(roomId);
-        Reservation reservation = loadReservationOrThrow(reservationId);
-        reservation.validatePassword(request.getPassword());
+        Reservation reservation = loadReservationOrThrow(roomId, reservationId);
+        reservation.checkPassword(request.getPassword());
         reservationRepository.delete(reservationId);
     }
 
-    private Reservation loadReservationOrThrow(Long reservationId) {
-        return reservationRepository.findById(reservationId)
+    private Reservation loadReservationOrThrow(Long roomId, Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(ReservationNotFoundException::new);
+        if (!reservation.sameRoomId(roomId)) {
+            throw new ReservationNotFoundException();
+        }
+        return reservation;
     }
 
     private Room loadRoomOrThrow(Long id) {

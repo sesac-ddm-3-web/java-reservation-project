@@ -5,6 +5,7 @@ import com.example.sesac_spring_practice_01.domain.reservation.exception.Reserva
 import com.example.sesac_spring_practice_01.domain.reservation.exception.ReservationTimeNotValidException;
 import com.example.sesac_spring_practice_01.global.ReservationIds;
 import com.example.sesac_spring_practice_01.global.utils.TimeUtils;
+import com.example.sesac_spring_practice_01.global.utils.ValidationUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,44 +35,16 @@ public class Reservation {
                         String name,
                         String phone,
                         String bookerPassword) {
-
-        if (roomId == null) {
-            throw new ReservationInvalidFieldException("roomId는 필수입니다.");
-        }
-        if (startAt == null || endAt == null) {
-            throw new ReservationInvalidFieldException("예약 시간은 필수입니다.");
-        }
-
-        LocalDateTime snappedStartAt = TimeUtils.snapToMinute(startAt);
-        LocalDateTime snappedEndAt = TimeUtils.snapToMinute(endAt);
-
-        if (!snappedStartAt.isBefore(snappedEndAt)) {
-            throw new ReservationTimeNotValidException();
-        }
-
-        if (isBlank(name)) {
-            throw new ReservationInvalidFieldException("예약자 이름은 필수입니다.");
-        }
-
-        if (isBlank(bookerPassword) || bookerPassword.length() != 4 ||
-                !bookerPassword.chars().allMatch(Character::isDigit)) {
-            throw new ReservationInvalidFieldException("비밀번호는 4자리 숫자여야 합니다.");
-        }
-
-        if (isBlank(phone) || !phone.matches("^010-\\d{4}-\\d{4}$")) {
-            throw new ReservationInvalidFieldException("전화번호는 010-xxxx-xxxx 형식이어야 합니다.");
-        }
-
         this.id = ReservationIds.nextId();
         this.roomId = roomId;
-        this.startAt = snappedStartAt;
-        this.endAt = snappedEndAt;
+        this.startAt = startAt;
+        this.endAt = endAt;
         this.bookerName = name;
         this.bookerPhone = phone;
         this.bookerPassword = bookerPassword;
     }
 
-    public void validatePassword(String password) {
+    public void checkPassword(String password) {
         if (!this.bookerPassword.equals(password)) {
             throw new ReservationPasswordIncorrectException();
         }
@@ -91,6 +64,7 @@ public class Reservation {
                                      String name,
                                      String phone,
                                      String bookerPassword) {
+        ValidationUtils.validateReservationFields(roomId, startAt, endAt, name, phone, bookerPassword);
         return new Reservation(roomId, startAt, endAt, name, phone, bookerPassword);
     }
 

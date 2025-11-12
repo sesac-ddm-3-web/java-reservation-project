@@ -5,6 +5,7 @@ import com.example.sesac_spring_practice_01.domain.reservation.Reservation;
 import com.example.sesac_spring_practice_01.domain.reservation.repository.InMemoryReservationRepository;
 import com.example.sesac_spring_practice_01.domain.room.Room;
 import com.example.sesac_spring_practice_01.domain.room.repository.InMemoryRoomRepository;
+import com.example.sesac_spring_practice_01.global.utils.TimeUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +33,8 @@ public class DummyDataInitializer implements CommandLineRunner {
         for (int i = 1; i <= 10; i++) {
             Room room = Room.create(
                     "회의실 " + i,
-                    LocalTime.of(9, 0),
-                    LocalTime.of(20, 0)
+                    TimeUtils.snapToMinute(LocalTime.of(9, 0)),
+                    TimeUtils.snapToMinute(LocalTime.of(20, 0))
             );
             roomRepository.save(room);
             for (int j = 0; j < 3; j++) {
