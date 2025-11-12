@@ -1,0 +1,8 @@
+package SpringMiniProject.SeSAC.MeetingRoom.Management.Domain;
+
+public class ReservationCollisionException extends RuntimeException {
+    public ReservationCollisionException(String message) {
+        super(message);
+    }
+
+}
