@@ -1,132 +1,417 @@
-# 0. 실습 환경 및 제출 방법
+# 회의실 예약 서비스
 
-## 실습 환경
+## 요구사항
 
-Build tool: Gradle or Maven (선택한 이유 필요)
+### 도메인
 
-Language: Java17 or Java 21 or Java 25 (선택한 이유 필요)
+#### 회의실 (MeetingRoom)
 
-Spring Boot: 3.5.7
+- 정보
+  - ID
+  - 이름
+  - 위치
+  - 최대 수용 인원
+- 기능
+  - 회의실은 ID로 식별 가능해야 한다.
+  - 회의실 이름을 변경할 수 있다.
+  - 회의실 위치를 변경할 수 있다.
+  - 참석 인원을 모두 수용할 수 있는지 확인할 수 있다.
+- 제약 조건
+  - 이름, 위치, 최대 수용 인원은 반드시 가지고 있어야 한다.
 
-인메모리 컬렉션 사용
+#### 예약 (Reservation)
 
-## 제출 방법
+- 정보
+  - ID 
+  - 예약한 회의실 ID
+  - 회의실 사용 시작 시간
+  - 회의실 사용 종료 시간
+  - 예약자 정보 (VO)
+- 기능
+  - 예약은 ID로 식별 가능해야 한다.
+  - 예약자 정보로 명시한 비밀번호가 일치하는지 확인할 수 있다.
 
-- 본인 github main(or master) branch로 부터 새로운 branch 생성
-- 작업 후 pull request 생성
-    - merge, rebase, squash 찾아보기
-- 리뷰어로 지정된 교육생 리뷰할 수 있도록 권한 부여
-- 11월 12일 23시 59분까지 페어 리뷰 (1 교육생당 2교육생 PR 리뷰)
-    - 완료되었으면 디스코드 쓰레드에 개별로 댓글 남겨주세요.
+#### 비품 (Equipment)
 
-## PR 리뷰 권장 사항
+- 정보
+  - ID
+  - 이름 
+  - 수량 
+  - 해당 비품이 비치된 회의실 ID
+- 기능
+  - 비품은 ID로 식별 가능해야 한다.
+  - 지정한 개수만큼 사용할 수 있는지 여부를 확인할 수 있다.
 
-- 해결하고자 하는 이슈나 요구사항을 제대로 구현했는지 확인
-- 구현된 핵심 비즈니스 로직이 올바른지, 엣지 케이스나 예외 상황을 충분히 고려했는지 검토
-- 테스트 코드가 있다면 적절하게 추가되었는지 확인
-- 코드 컨벤션 (변수, 메소드, 클래스 이름, 메소드 길이 등)이 명확하고 의미를 잘 전달하는지, 표준 명명 규칙을 따르는지 확인
-- 좋은 예시
-    - 변수명 `tempVal` 대신 `customerPendingCount`처럼 의도를 명확히 드러내는 이름으로 바꾸면 가독성이 좋아져요. (가이드: [팀의 명명 규칙 문서] 참고)
-    - 현재 `findById`를 반복문 내에서 호출하면 N+1 문제가 발생할 수 있어요. `fetch join`이나 `@BatchSize`를 활용하여 한 번의 쿼리로 데이터를 가져오도록 개선하면 성능이 향상됩니다. 이렇게 해볼까요?
-    - 비즈니스 로직은 주로 `Service` 계층에서 처리하도록 역할을 분리하는 것이 좋습니다. `Controller`는 요청/응답 처리만 담당하도록 해당 로직을 `UserService`로 옮기는 것을 고려해 주세요.
-    - 로그인 성공 로직이 깔끔하게 구현되었네요! 특히 [특정 코드] 부분은 좋은 설계입니다.
-- 나쁜 예시
-    - 이 변수명은 별로예요.
-    - 이건 N+1 문제 일으켜요. 수정하세요.
-    - 비즈니스 로직이 컨트롤러에 있어요.
-- 리뷰에 단순 퀴즈쇼는 지양할 것
-    - ex) 이렇게 한 이유가 뭐에요?, 이건 무슨 의미에요?
+### 값 객체 (Value Objects)
 
-## PR 리뷰 조
+#### 회의실 ID (MeetingRoomId)
+- 회의실 ID를 표현하기 위한 VO
+- ID를 부여받기 전 비어 있는 ID를 표현하기 위한 VO
 
-- 찬용 - 지민, 동훈
-- 지민 - 희찬, 은서
-- 준하 - 찬용, 종균
-- 희찬 - 현수, 준영
-- 지우 - 준하, 찬미
-- 현수 - 찬미, 나현
-- 나현 - 지우, 현수
-- 찬미 - 종균, 지우
-- 준영 - 나현, 희찬
-- 종균 - 동훈, 준하
-- 은서 - 준영, 지민
-- 동훈 - 은서, 찬용
+#### 회의실 위치 (MeetingRoomLocation)
+- 회의실 위치를 표현하기 위한 VO
 
-# 1. 요구사항
+#### 예약 ID (ReservationId)
+- 예약 ID를 표현하기 위한 VO
+- ID를 부여받기 전 비어 있는 ID를 표현하기 위한 VO
 
-“회의실(또는 스터디룸)”과 “예약”이라는 두 가지 핵심 도메인을 자유롭게 설계해야 합니다.
+#### 비회원 예약자 (Organizer)
+- 비회원 예약자를 표현하기 위한 VO
+- 오로지 비회원으로만 예약이 가능하며, 같은 이름을 가지고 있다고 하더라도 동일한 사용자가 아닐 수 있으므로 VO로 표현
 
-첫 요구사항에 있는 기본 기능을 구현하고 완성한 교육생은 2, 3, 4번까지 순서대로 진행하면 됩니다.
+#### 비품 사용 정보 (EquipmentUsage)
+- 예약 영역에서 비품 사용 정보를 표현하기 위한 VO
+- 기존 비품 도메인(Equipment)과 특정 시간에 종속적인, 예약 영역에서의 비품 사용 정보를 분리하기 위해 사용
 
-시간은 17시 ~ 21시 30분까지 진행할 예정입니다.
+### 컬렉션
 
-아래 요구사항과 별개로 README에 본인들이 작업할 프로젝트 요구사항들을 정리해서 적어보세요.
+#### 회의실 목록 (MeetingRooms)
 
-README 자체가 죽지 않은 문서가 되도록 잘 관리하면서 프로젝트 해보면 좋을 것 같습니다.
+- 기능
+  - 회의실 ID로 해당 회의실을 조회할 수 있다.
+  - 회의실 이름으로 해당 회의실을 조회할 수 있다.
+  - 회의실 위치로 해당 회의실을 조회할 수 있다.
+  - 지정한 참석 인원을 수용할 수 있는 회의실을 모두 조회할 수 있다.
 
-## 회의실 요구사항
+#### 예약 목록 (Reservations)
 
-- 애플리케이션이 시작될 때, 미리 정의된 여러 개의 회의실 정보가 인메모리 컬렉션에 저장되어 있어야 합니다.
-- **[API]** 전체 회의실 목록을 조회하는 API를 구현해야 합니다.
+- 기능
+  - 특정 예약을 추가할 수 있는지 확인할 수 있다.
+  - 특정 예약을 삭제할 수 있는지 확인할 수 있다.
+  - 반복 예약을 추가할 수 있는지 확인할 수 있다.
+- 제약 조건
+  - 새로운 예약은 기존의 다른 예약과 시간이 겹치지 않아야 한다.
+  - 이미 사용 중인 예약이라면 취소할 수 없다.
 
-## 예약 요구사항
+#### 비품 목록 (Equipments)
 
-- 예약 정보는 특정 회의실 시작 시간, 종료 시간, 예약자 정보(아래 추가 설명)을 포함해야 합니다.
-- 비회원 예약제로 진행하여야 합니다. 아래 정보는 필수로 있어야 합니다.
-    - 예약자명
-    - 전화번호
-    - 비밀번호 (예약 수정, 삭제 시 본인 확인용)
-- **[API]** 새 예약을 생성하는 API를 구현해야 합니다.
-- **[API]** 특정 회의실의 모든 예약 현황을 조회하는 API를 구현해야 합니다.
-- **[API]** 특정 예약을 취소(삭제)하는 API를 구현해야 합니다.
+- 기능
+  - 특정 회의실의 비품을 원하는 만큼 사용할 수 있는지 확인할 수 있다.
 
-## 핵심 비즈니스 로직 및 제약 조건
+#### 비품 사용 정보 목록 (EquipmentUsages)
 
-- 예약 충돌 감지
-    - 새 예약을 생성할 때, 요청된 회의실의 요청된 시간대가 기존 다른 예약과 겹치는지 확인해야 합니다.
-    - 시간이 겹치는 예약이 이미 존재한다면, 예약을 생성하지 않고 HTTP 상태 코드로 응답해야 합니다.
-- 예약 취소 시 비밀번호 검증
-    - API 호출 시, 비밀번호를 함께 받아야 합니다.
-        - 비밀번호를 받는 방식은 자율적으로 설계하시면 됩니다.
-    - 저장된 예약의 비밀번호와 일치하는 경우에만 삭제가 가능합니다.
-    - 비밀번호가 틀릴 경우, HTTP status로 응답해야 합니다.
-- 유효성 검사
-    - 예약 요청 시, 종료 시간은 시작 시간보다 늦어야 합니다.
-    - 예약자 정보 등 필수 값은 비어있지 않아야 합니다.
-- 예외 처리
-    - 존재하지 않는 회의실 ID로 예약하려는 경우
-    - 예약 시간이 겹치는 경우
-    - 유효성 검사 실패한 경우
-    - 등등
+- 기능
+  - 특정 비품의 사용 수량을 반환할 수 있다.
 
-# 2. 추가 기능 구현
+### 레포지토리
 
-## 1단계 - 회의실 수용 인원 및 예약 인원 제한
+#### 회의실 레포지토리 (MeetingRoomRepository)
 
-### 요구사항
+- 설명
+  - 회의실을 관리하는 레포지토리
+  - 요구사항에 회의실을 추가/삭제하는 내용이 없으므로 단순 조회 기능만 제공
+- 구현체 (InMemoryMeetingRoomRepository)
+  - 인메모리에서 회의실을 관리하는 레포지토리
+  - 생성자에서 미리 정의한 여러 개의 회의실 초기화
 
-- 회의실 정보에 최대 수용 인원을 추가합니다.
-- 예약 요청 시, 참석 인원을 함께 받도록 수정합니다.
-- 새 예약 생성 시, 요청된 참석 인원이 해당 회의실의 최대 수용 인원을 초과하는지 검증합니다.
-- 초과할 경우, 적절한 HTTP status로 응답합니다.
-- **[API] 최소 수용 인원으로 필터링 하는 기능을 추가합니다.**
+#### 예약 레포지토리 (ReservationRepository)
 
-## 2단계 - 반복 예약 기능 구현
+- 설명
+  - 특정 회의실에 대한 예약을 관리하는 레포지토리
+  - 저장 / 조회 / 삭제 기능 제공
+- 구현체 (InMemoryReservationRepository)
+  - 인메모리에서 예약을 관리하는 레포지토리
 
-### 요구사항
+#### 비품 레포지토리 (EquipmentRepository)
 
-- 새로운 반복 예약 API를 구현합니다.
-- 요청에 기본 예약 정보 외에, 반복 규칙 (e.g., type: WEEKLY, repeatCount: 4 → 4주간 매주 반복)을 포함합니다. (기본 예약 정보에 포함된 유저 정보는 모든 반복 예약에 동일하게 적용됩니다.)
-- 반복 규칙에 따라 생성될 모든 예약에 대해 미리 충돌 검사를 수행합니다.
-- 4개의 예약 중 단 하나라도 기존 예약과 충돌한다면 HTTP status로 응답하고 아무것도 저장하지 않아야 합니다.
-- 모든 반복 예약의 시간이 비어있을 경우에만 모두 저장소에 추가합니다.
+- 설명
+  - 특정 회의실에 대한 비품을 관리하는 레포지토리 
+  - 요구사항에 비품을 추가/삭제하는 내용이 없으므로 단순 조회 기능만 제공
+- 구현체 (InMemoryEquipmentRepository)
+  - 인메모리에서 비품을 관리하는 레포지토리 
+  - 생성자에서 미리 정의한 여러 개의 비품 초기화 
 
-## 3단계 - 회의실 비품 동시 예약
+### 팩토리 
 
-- 비품 도메인을 새로 설계합니다. 이 도메인은 전체 재고 수량을 가지고 있어야 합니다.
-- 비품 데이터도 애플리케이션 시작 시, 미리 인메모리에 저장합니다.
-- 예약 요청에 요청할 비품 목록을 추가합니다.
-- 새 예약 생성 시, 회의실 시간이 비어있는지 검사해야 합니다. (기존 요구사항)
-- 추가로 요청된 각 비품에 대해, 해당 예약 시간에 이미 예약된 수량을 계산해야 합니다.
-- 이미 예약된 수량이 해당 비품의 전체 재고 수량을 초과하는지 검사합니다.
-- 이회의실 시간이 비어있더라도, 요청한 비품 중 단 하나라도 재고가 부족하면 HTTP status로 응답하고 전체 예약을 실패 시켜야 합니다.
+#### 예약 팩토리 (ReservationFactory)
+
+- 설명
+  - Reservation 생성 시 검증 및 조립을 수행하는 팩토리 
+  - 내부적으로 레포지토리를 통해 일급 컬렉션을 조회해 검증 로직 수행
+
+### API
+
+#### 회의실 
+
+##### 전체 회의실 조회
+```text
+GET /rooms
+GET /rooms?attendeeCount={참석 인원}
+
+Response:
+{
+  "meetingRooms": [
+    {
+      "id": 1,
+      "name": "회의실 A",
+      "floor": 3,
+      "roomNumber": 1,
+      "capacity": 10
+    },
+    {
+      "id": 2,
+      "name": "회의실 B",
+      "floor": 3,
+      "roomNumber": 21,
+      "capacity": 20
+    }
+  ]
+}
+
+```
+
+| 파라미터          | 타입  | 필수 여부 | 설명                       |
+| ------------- | --- | ----- | ------------------------ |
+| attendeeCount | int | 선택    | 지정한 인원을 수용할 수 있는 회의실만 조회 |
+
+| 필드                        | 타입     | 설명     |
+| ------------------------- | ------ | ------ |
+| meetingRooms              | Array  | 회의실 목록 |
+| meetingRooms[].id         | Long   | 회의실 ID |
+| meetingRooms[].name       | String | 회의실 이름 |
+| meetingRooms[].floor      | int    | 층수     |
+| meetingRooms[].roomNumber | int    | 호실 번호  |
+
+#### 비품
+
+##### 전체 회의실 비품 조회 
+
+```text
+GET /equipments
+
+Response:
+{
+  "equipments": {
+    "1": [
+      {
+        "id": 1,
+        "name": "빔 프로젝터",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "name": "화이트보드",
+        "quantity": 1
+      }
+    ],
+    "2": [
+      {
+        "id": 3,
+        "name": "빔 프로젝터",
+        "quantity": 1
+      }
+    ]
+  }
+}
+
+```
+
+| 필드                         | 타입     | 설명                     |
+| -------------------------- | ------ | ---------------------- |
+| equipments                 | Map    | 회의실별 비품 목록 (키: 회의실 ID) |
+| equipments.{meetingRoomId} | Array  | 해당 회의실의 비품 목록          |
+| equipments.{}.id           | Long   | 비품 ID                  |
+| equipments.{}.name         | String | 비품 이름                  |
+| equipments.{}.quantity     | int    | 보유 수량                  |
+
+##### 특정 회의실 비품 조회 
+
+```text
+GET /equipments/{meetingRoomId}
+
+Response:
+{
+  "equipments": [
+    {
+      "id": 1,
+      "name": "빔 프로젝터",
+      "quantity": 2
+    },
+    {
+      "id": 2,
+      "name": "화이트보드",
+      "quantity": 1
+    }
+  ]
+}
+
+```
+
+| 파라미터          | 타입   | 필수 여부 | 설명     |
+| ------------- | ---- | ----- | ------ |
+| meetingRoomId | Long | 필수    | 회의실 ID |
+
+| 필드                    | 타입     | 설명    |
+| --------------------- | ------ | ----- |
+| equipments            | Array  | 비품 목록 |
+| equipments[].id       | Long   | 비품 ID |
+| equipments[].name     | String | 비품 이름 |
+| equipments[].quantity | int    | 보유 수량 |
+
+#### 예약
+
+##### 예약 조회
+
+```text
+GET /rooms/{meetingRoomId}/reservations/{reservationId}
+
+{
+  "id": 1,
+  "startTime": "2025-11-11T10:00:00",
+  "endTime": "2025-11-11T12:00:00",
+  "attendeeCount" : 5,
+  "organizer": {
+    "name": "예약자1",
+    "phoneNumber": "010-1234-5678",
+    "password": "1234"
+  },
+  "equipmentUsages": [
+      {
+          "id": 1,
+          "name": "빔프로젝터",
+          "quantity": 2
+      }
+  ]
+}
+```
+
+| 필드                                   | 타입            | 설명           |
+| ------------------------------------ | ------------- | ------------ |
+| id                    | Long          | 예약 ID        |
+| startTime             | LocalDateTime | 회의실 사용 시작 시간 |
+| endTime               | LocalDateTime | 회의실 사용 종료 시간 |
+| organizer             | Object        | 비회원 예약자 정보   |
+| organizer.name        | String        | 이름           |
+| organizer.phoneNumber | String        | 전화번호         |
+| organizer.password    | String        | 비밀번호         |
+
+
+##### 회의실 예약 조회
+
+```text
+GET /rooms/{meetingRoomId}/reservations
+
+{
+  "reservations": [
+    {
+      "id": 1,
+      "startTime": "2025-11-11T10:00:00",
+      "endTime": "2025-11-11T12:00:00",
+      "attendeeCount" : 5,
+      "organizer": {
+        "name": "예약자1",
+        "phoneNumber": "010-1234-5678",
+        "password": "1234"
+      }
+    },
+    {
+      "id": 2,
+      "startTime": "2025-11-11T14:00:00",
+      "endTime": "2025-11-11T16:00:00",
+      "attendeeCount" : 3,
+      "organizer": {
+        "name": "예약자2",
+        "phoneNumber": "010-5678-1234",
+        "password": "5678"
+      }
+    }
+  ]
+}
+```
+
+| 필드                                   | 타입            | 설명           |
+| ------------------------------------ | ------------- | ------------ |
+| reservations                         | Array         | 예약 목록        |
+| reservations[].id                    | Long          | 예약 ID        |
+| reservations[].startTime             | LocalDateTime | 회의실 사용 시작 시간 |
+| reservations[].endTime               | LocalDateTime | 회의실 사용 종료 시간 |
+| reservations[].organizer             | Object        | 비회원 예약자 정보   |
+| reservations[].organizer.name        | String        | 이름           |
+| reservations[].organizer.phoneNumber | String        | 전화번호         |
+| reservations[].organizer.password    | String        | 비밀번호         |
+
+##### 회의실 예약 
+
+```text
+POST /rooms/{meetingRoomId}/reservations
+
+Request:
+{
+  "startTime": "2025-11-11T10:00:00",
+  "endTime": "2025-11-11T12:00:00",
+  "organizer": {
+    "name": "홍길동",
+    "phoneNumber": "010-1234-5678",
+    "password": "1234"
+  }
+}
+
+Response:
+201 Created
+Location: /rooms/{meetingRoomId}/reservations/{reservationId}
+
+```
+
+| 필드                    | 타입            | 필수 여부 | 설명           |
+| --------------------- | ------------- | ----- | ------------ |
+| startTime             | LocalDateTime | 필수    | 회의실 사용 시작 시간 |
+| endTime               | LocalDateTime | 필수    | 회의실 사용 종료 시간 |
+| organizer             | Object        | 필수    | 비회원 예약자 정보   |
+| organizer.name        | String        | 필수    | 이름           |
+| organizer.phoneNumber | String        | 필수    | 전화번호         |
+| organizer.password    | String        | 필수    | 비밀번호         |
+
+##### 회의실 반복 예약 
+```text
+POST /rooms/{meetingRoomId}/reservations/repeat
+
+Request:
+{
+  "startTime": "2025-11-11T10:00:00",
+  "endTime": "2025-11-11T12:00:00",
+  "organizer": {
+    "name": "홍길동",
+    "phoneNumber": "010-1234-5678",
+    "password": "1234"
+  },
+  "attendeeCount": 5,
+  "frequency": "WEEKLY",
+  "repeatCount": 4
+}
+
+Response:
+201 Created
+Location: /rooms/{meetingRoomId}/reservations
+
+```
+
+| 필드                    | 타입            | 필수 여부 | 설명                                     |
+| --------------------- | ------------- | ----- | -------------------------------------- |
+| startTime             | LocalDateTime | 필수    | 회의실 사용 시작 시간                           |
+| endTime               | LocalDateTime | 필수    | 회의실 사용 종료 시간                           |
+| organizer             | Object        | 필수    | 비회원 예약자 정보                             |
+| organizer.name        | String        | 필수    | 이름                                     |
+| organizer.phoneNumber | String        | 필수    | 전화번호                                   |
+| organizer.password    | String        | 필수    | 비밀번호                                   |
+| attendeeCount         | Integer       | 필수    | 참가 인원 (양수)                             |
+| frequency             | String        | 필수    | 반복 주기 (DAILY, WEEKLY, MONTHLY, YEARLY) |
+| repeatCount           | Integer       | 필수    | 반복 횟수 (양수)                             |
+
+##### 회의실 예약 취소
+
+```text
+DELETE /rooms/{meetingRoomId}/reservations/{reservationId}
+
+Request:
+{
+  "password": "1234"
+}
+
+Response:
+204 No Content
+
+```
+
+| 필드       | 타입     | 필수 여부 | 설명   |
+| -------- | ------ | ----- | ---- |
+| password | String | 필수    | 비밀번호 |
