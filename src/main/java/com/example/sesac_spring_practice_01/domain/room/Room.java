@@ -1,21 +1,15 @@
 package com.example.sesac_spring_practice_01.domain.room;
 
-import com.example.sesac_spring_practice_01.domain.room.exception.RoomInvalidFieldException;
 import com.example.sesac_spring_practice_01.domain.room.exception.RoomReservationTimeOutOfRangeException;
 import com.example.sesac_spring_practice_01.global.RoomIds;
 import com.example.sesac_spring_practice_01.global.utils.ValidationUtils;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-import static com.example.sesac_spring_practice_01.global.utils.TimeUtils.snapToMinute;
-import static com.example.sesac_spring_practice_01.global.utils.ValidationUtils.isBlank;
-
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room {
 

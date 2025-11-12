@@ -1,23 +1,17 @@
 package com.example.sesac_spring_practice_01.domain.reservation;
 
-import com.example.sesac_spring_practice_01.domain.reservation.exception.ReservationInvalidFieldException;
 import com.example.sesac_spring_practice_01.domain.reservation.exception.ReservationPasswordIncorrectException;
-import com.example.sesac_spring_practice_01.domain.reservation.exception.ReservationTimeNotValidException;
 import com.example.sesac_spring_practice_01.global.ReservationIds;
-import com.example.sesac_spring_practice_01.global.utils.TimeUtils;
 import com.example.sesac_spring_practice_01.global.utils.ValidationUtils;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static com.example.sesac_spring_practice_01.global.utils.ValidationUtils.isBlank;
 
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation {
 
