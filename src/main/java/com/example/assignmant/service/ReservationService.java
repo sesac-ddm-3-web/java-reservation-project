@@ -1,6 +1,7 @@
 package com.example.assignmant.service;
 
 import com.example.assignmant.domain.Reservation;
+import com.example.assignmant.domain.Room;
 import com.example.assignmant.dto.ReservationDeleteDto;
 import com.example.assignmant.dto.ReservationDto;
 import com.example.assignmant.repository.ReservationRepository;
@@ -13,15 +14,18 @@ import java.util.List;
 @Service
 public class ReservationService {
     private final ReservationRepository<Reservation> reservationRepository;
+    private final RoomService roomService;
     private final ModelMapper modelMapper;
     private final ReservationValidator reservationValidator;
 
     public ReservationService(
             ReservationRepository<Reservation> reservationRepository,
+            RoomService roomService,
             ModelMapper modelMapper,
             ReservationValidator reservationValidator
     ) {
         this.reservationRepository = reservationRepository;
+        this.roomService = roomService;
         this.modelMapper = modelMapper;
         this.reservationValidator = reservationValidator;
     }
@@ -29,10 +33,12 @@ public class ReservationService {
     public ReservationDto createReservation(Long roomId, ReservationDto reservationDto) {
         reservationValidator.validate(reservationDto);
 
+        Room room = roomService.findById(roomId);
+        checkRoomCapacity(room, reservationDto.getCapacity());
+
         checkReservationConflict(roomId, reservationDto);
 
         Reservation reservation = modelMapper.map(reservationDto, Reservation.class);
-
         Reservation created = reservationRepository.create(reservation);
 
         return modelMapper.map(created, ReservationDto.class);
@@ -43,8 +49,8 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findByRoomId(roomId);
         return reservations
                 .stream()
-                .map(reservation -> modelMapper.map(reservation,ReservationDto.class))
                 .sorted()
+                .map(reservation -> modelMapper.map(reservation,ReservationDto.class))
                 .toList();
     }
 
@@ -73,7 +79,7 @@ public class ReservationService {
             throw new IllegalArgumentException("해당 방의 예약이 아닙니다.");
         }
 
-        if(reservation.isOwner(
+        if(!reservation.isOwner(
                 deleteDto.getName(),
                 deleteDto.getPhoneNumber(),
                 deleteDto.getPassword()
@@ -102,5 +108,12 @@ public class ReservationService {
                 });
     }
 
-
+    private void checkRoomCapacity(Room room, int capacity) {
+        if (!room.canAccommodate(capacity)) {
+            throw new IllegalArgumentException(
+                    String.format("요청 인원(%d명)이 방의 최대 수용 인원(%d명)을 초과합니다.",
+                            capacity, room.getMaxCapacity())
+            );
+        }
+    }
 }

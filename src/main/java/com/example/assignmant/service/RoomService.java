@@ -17,4 +17,9 @@ public class RoomService {
     public List<Room> findAll() {
         return roomRepository.findAll();
     }
+
+    public Room findById(Long roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방입니다."));
+    }
 }

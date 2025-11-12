@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class RoomRepository {
     private final Map<Long, Room > store = new ConcurrentHashMap<>();
-    private final AtomicLong sequence = new AtomicLong(1L);
+    private final AtomicLong sequence = new AtomicLong(101L);
 
     public List<Room> findAll() {
         return new ArrayList<>(store.values());
@@ -27,10 +27,9 @@ public class RoomRepository {
     @PostConstruct
     public void init() {
         for (int i = 101; i <= 105; i++) {
-            Room room = new Room();
-            room.setId(sequence.getAndIncrement());
-            room.setRoomNumber(i);
-            store.put(room.getId(), room);
+            long increment = sequence.getAndIncrement();
+            Room room = new Room(increment, i, 5);
+            store.put(increment, room);
         }
     }
 }

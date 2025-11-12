@@ -5,6 +5,12 @@ public class Room {
     private int roomNumber;
     private int maxCapacity;
 
+    public Room(Long id, int roomNumber, int maxCapacity) {
+        this.id = id;
+        this.roomNumber = roomNumber;
+        this.maxCapacity = maxCapacity;
+    }
+
     public Long getId() {
         return id;
     }
@@ -13,13 +19,12 @@ public class Room {
         return roomNumber;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setRoomNumber(int roomNumber) {
-        this.roomNumber = roomNumber;
+    public int getMaxCapacity() {
+        return maxCapacity;
     }
 
 
+    public boolean canAccommodate(int requestedCapacity) {
+        return this.maxCapacity >= requestedCapacity;
+    }
 }

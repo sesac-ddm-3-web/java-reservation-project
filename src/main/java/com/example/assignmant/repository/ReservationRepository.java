@@ -1,7 +1,5 @@
 package com.example.assignmant.repository;
 
-import com.example.assignmant.dto.ReservationDto;
-
 import java.util.List;
 import java.util.Optional;
 

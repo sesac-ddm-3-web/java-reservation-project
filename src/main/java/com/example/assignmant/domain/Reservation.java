@@ -1,9 +1,10 @@
 package com.example.assignmant.domain;
 
 import com.example.assignmant.Constant;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
-
+@Getter
 public class Reservation implements Comparable<Reservation> {
     private Long id;
     private String name;
@@ -12,6 +13,7 @@ public class Reservation implements Comparable<Reservation> {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Long roomId;
+    private Integer capacity;
 
     public Reservation() {
     }
@@ -21,7 +23,8 @@ public class Reservation implements Comparable<Reservation> {
                        String password,
                        LocalDateTime startTime,
                        LocalDateTime endTime,
-                       Long roomId
+                       Long roomId,
+                       Integer capacity
     ) {
         validateName(name);
         validatePassword(password);
@@ -34,6 +37,7 @@ public class Reservation implements Comparable<Reservation> {
         this.startTime = startTime;
         this.endTime = endTime;
         this.roomId = roomId;
+        this.capacity = capacity;
     }
 
     public boolean isSameRoom(Long id) {
@@ -71,9 +75,6 @@ public class Reservation implements Comparable<Reservation> {
         this.id = id;
     }
 
-    public Long getId() {
-        return id;
-    }
 
     private void validateName(String name) {
         if (name.length() > 20) {
