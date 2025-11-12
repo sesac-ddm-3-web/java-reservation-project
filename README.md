@@ -59,7 +59,11 @@
 - 비회원 예약자를 표현하기 위한 VO
 - 오로지 비회원으로만 예약이 가능하며, 같은 이름을 가지고 있다고 하더라도 동일한 사용자가 아닐 수 있으므로 VO로 표현
 
-### 일급 컬렉션
+#### 비품 사용 정보 (EquipmentUsage)
+- 예약 영역에서 비품 사용 정보를 표현하기 위한 VO
+- 기존 비품 도메인(Equipment)과 특정 시간에 종속적인, 예약 영역에서의 비품 사용 정보를 분리하기 위해 사용
+
+### 컬렉션
 
 #### 회의실 목록 (MeetingRooms)
 
@@ -83,6 +87,11 @@
 
 - 기능
   - 특정 회의실의 비품을 원하는 만큼 사용할 수 있는지 확인할 수 있다.
+
+#### 비품 사용 정보 목록 (EquipmentUsages)
+
+- 기능
+  - 특정 비품의 사용 수량을 반환할 수 있다.
 
 ### 레포지토리
 
@@ -163,6 +172,82 @@ Response:
 | meetingRooms[].floor      | int    | 층수     |
 | meetingRooms[].roomNumber | int    | 호실 번호  |
 
+#### 비품
+
+##### 전체 회의실 비품 조회 
+
+```text
+GET /equipments
+
+Response:
+{
+  "equipments": {
+    "1": [
+      {
+        "id": 1,
+        "name": "빔 프로젝터",
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "name": "화이트보드",
+        "quantity": 1
+      }
+    ],
+    "2": [
+      {
+        "id": 3,
+        "name": "빔 프로젝터",
+        "quantity": 1
+      }
+    ]
+  }
+}
+
+```
+
+| 필드                         | 타입     | 설명                     |
+| -------------------------- | ------ | ---------------------- |
+| equipments                 | Map    | 회의실별 비품 목록 (키: 회의실 ID) |
+| equipments.{meetingRoomId} | Array  | 해당 회의실의 비품 목록          |
+| equipments.{}.id           | Long   | 비품 ID                  |
+| equipments.{}.name         | String | 비품 이름                  |
+| equipments.{}.quantity     | int    | 보유 수량                  |
+
+##### 특정 회의실 비품 조회 
+
+```text
+GET /equipments/{meetingRoomId}
+
+Response:
+{
+  "equipments": [
+    {
+      "id": 1,
+      "name": "빔 프로젝터",
+      "quantity": 2
+    },
+    {
+      "id": 2,
+      "name": "화이트보드",
+      "quantity": 1
+    }
+  ]
+}
+
+```
+
+| 파라미터          | 타입   | 필수 여부 | 설명     |
+| ------------- | ---- | ----- | ------ |
+| meetingRoomId | Long | 필수    | 회의실 ID |
+
+| 필드                    | 타입     | 설명    |
+| --------------------- | ------ | ----- |
+| equipments            | Array  | 비품 목록 |
+| equipments[].id       | Long   | 비품 ID |
+| equipments[].name     | String | 비품 이름 |
+| equipments[].quantity | int    | 보유 수량 |
+
 #### 예약
 
 ##### 예약 조회
@@ -179,7 +264,14 @@ GET /rooms/{meetingRoomId}/reservations/{reservationId}
     "name": "예약자1",
     "phoneNumber": "010-1234-5678",
     "password": "1234"
-  }
+  },
+  "equipmentUsages": [
+      {
+          "id": 1,
+          "name": "빔프로젝터",
+          "quantity": 2
+      }
+  ]
 }
 ```
 
