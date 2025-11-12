@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <button onclick="getMeetingRoomListRequest();">회의실 예약하기</button>
+        <ul id="meetingroom-list"></ul>
+
+        <script>
+            function getMeetingRoomListRequest(){
+                function onReadyStateChange(e){
+                    const currentAjaxRequest = e.currentTarget;
+
+                    if(currentAjaxRequest.readyState === XMLHttpRequest.DONE){
+                        if(currentAjaxRequest.status === 200){
+
+                            const listDom = document.querySelector('#meetingroom-list');
+                            listDom.innerHTML = ''; // 기존 목록 초기화
+
+                            const rooms = JSON.parse(currentAjaxRequest.responseText);
+                            rooms.forEach(room => {
+                                const liNode = document.createElement('li');
+                                const textNode = document.createTextNode(room.name);
+                                liNode.appendChild(textNode);
+                                listDom.appendChild(liNode);
+                            });
+
+                        } else {
+                            console.log('request failed');
+                        }
+                    }
+                }
+
+                const ajaxRequest = new XMLHttpRequest();
+
+                ajaxRequest.onreadystatechange = onReadyStateChange;
+                ajaxRequest.open('GET', '/meetingrooms');
+                ajaxRequest.send();
+            }
+        </script>
+    </body>
+</html>
