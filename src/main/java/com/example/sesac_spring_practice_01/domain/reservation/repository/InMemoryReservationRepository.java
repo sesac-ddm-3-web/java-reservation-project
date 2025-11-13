@@ -2,13 +2,14 @@ package com.example.sesac_spring_practice_01.domain.reservation.repository;
 
 import com.example.sesac_spring_practice_01.domain.reservation.Reservation;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Repository
 public class InMemoryReservationRepository implements ReservationRepository {
 
     private final Map<Long, Reservation> reservations = new HashMap<>();
